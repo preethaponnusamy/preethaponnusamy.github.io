@@ -54,32 +54,54 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
   }
 
   async makeSoapRequest() {
-    const serviceID = 'era-pmt-branchinfo-serviceid';
-    const servicePassword = '_pkJ59$=XVs.gWM7wP:539p$_$@]uX';
-    const soapEnvelope = `
-      <soapenv:Envelope xmlns:erad="http://www.pnc.com/pmt/ERADBLookupService" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-        <soapenv:Header>
-          <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-            <wsse:UsernameToken wsu:Id="UsernameToken-4EC151B4BE18CC0AB515084488315391">
-              <wsse:Username>${serviceID}</wsse:Username>
-              <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${servicePassword}</wsse:Password>
-            </wsse:UsernameToken>
-          </wsse:Security>
-        </soapenv:Header>
-        <soapenv:Body>
-          <erad:MarketNameRequest>
-            <erad:listMarkets>true</erad:listMarkets>
-            <erad:listFutureMarkets>false</erad:listFutureMarkets>
-          </erad:MarketNameRequest>
-        </soapenv:Body>
-      </soapenv:Envelope>`;
-
+    // const serviceID = 'era-pmt-branchinfo-serviceid';
+    // const servicePassword = '_pkJ59$=XVs.gWM7wP:539p$_$@]uX';
+    // const soapEnvelope = `
+    //   <soapenv:Envelope xmlns:erad="http://www.pnc.com/pmt/ERADBLookupService" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+    //     <soapenv:Header>
+    //       <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    //         <wsse:UsernameToken wsu:Id="UsernameToken-4EC151B4BE18CC0AB515084488315391">
+    //           <wsse:Username>${serviceID}</wsse:Username>
+    //           <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${servicePassword}</wsse:Password>
+    //         </wsse:UsernameToken>
+    //       </wsse:Security>
+    //     </soapenv:Header>
+    //     <soapenv:Body>
+    //       <erad:MarketNameRequest>
+    //         <erad:listMarkets>true</erad:listMarkets>
+    //         <erad:listFutureMarkets>false</erad:listFutureMarkets>
+    //       </erad:MarketNameRequest>
+    //     </soapenv:Body>
+    //   </soapenv:Envelope>`;
+       const serviceID='ERA-PMT-PNCIHierarchyInfo-serviceID';
+       const servicePassword='R404?d!$5dsiC3YagT+1A$M*iSUcqZ';
+       const nonce='BwFC2HW6jfMgHr/N9OCyfw==';
+       const createdDate='2017-12-14T21:23:28.843Z';
+       const repIDInfo='1234';
+        const soapEnvelope = `<soapenv:Envelope xmlns:get=\"http://www.pnc.com/pmt/GetRKIInfoService/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">
+              <soapenv:Header>
+              <wsse:Security soapenv:mustUnderstand=\"1\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">
+                  <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">
+                      <wsse:Username>  ${serviceID} </wsse:Username>
+                      <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\"> ${servicePassword} </wsse:Password>
+                      <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\"> ${nonce}</wsse:Nonce>
+                      <wsu:Created> ${createdDate} </wsu:Created>
+                  </wsse:UsernameToken>
+              </wsse:Security>
+              </soapenv:Header>
+              <soapenv:Body>
+                  <get:PNCIHierarchyInfoRequest >${repIDInfo} </get:PNCIHierarchyInfoRequest>
+               </soapenv:Body>
+          </soapenv:Envelope>`;
+      
     try {
-      const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-eradblookupservice', {
+      // const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-eradblookupservice', {
+        const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-getrkiinfoService', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/xml; charset="utf-8"',
-          'SOAPAction': 'getMarketNameList',
+          // 'SOAPAction': 'getMarketNameList',
+            'SOAPAction': 'getPNCIHierarchyInfo',
         },
         body: soapEnvelope,
       });
