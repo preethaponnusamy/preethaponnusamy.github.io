@@ -1,11 +1,25 @@
 import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
-import {JSONPath} from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
-
+import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
+import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js";
 export class PreethaWebApiRequestSOAPDev extends LitElement {
 
     static properties = {
-        who: { type: String },
-        response: { type: String },
+        pluginLoaded: { type: Boolean },
+        message: { type: String },
+        serviceID: { type: String },
+        servicePassword: { type: String },
+        endpointUrl: { type: String },
+        eradNamespaceURI: { type: String },
+        SOAPAction: { type: String },
+        SOAPBody: { type: String },
+        headers: { type: String },
+        isIntegratedAuth: { type: Boolean },
+        jsonPath: { type: String },
+        displayAs: { type: String },
+        mustacheTemplate: { type: String },
+        currentPageMode: { type: String },
+        outcome: { type: String },
+        response: { type: String }
     };
 
     static getMetaConfig() {
@@ -16,7 +30,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             iconUrl: 'data-lookup',
             searchTerms: ['soap', 'webapi'],
             fallbackDisableSubmit: false,
-            version: '1.0',
+            version: '1.1',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -24,27 +38,161 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                 visibility: true
             },
             properties: {
-                who: {
+                serviceID: {
                     type: 'string',
-                    title: 'Who',
-                    description: 'Who to say hello to'
+                    title: 'Service ID',
+                    description: 'Provide Service ID',
+                    required: true,
+                },
+                servicePassword: {
+                    type: 'string',
+                    title: 'Service Password',
+                    description: 'Provide Service Password',
+                    required: true,
+                },
+                endpointUrl: {
+                    type: 'string',
+                    title: 'SOAP Endpoint',
+                    description: 'Provide SOAP Endpoint ',
+                    required: true,
+                    defaultValue: 'https://jsonplaceholder.typicode.com/todos'
+                },
+                eradNamespaceURI: {
+                    type: 'string',
+                    title: 'Namespace URI for erad',
+                    description: 'Provide Namespace URI for erad',
+                    required: true,
+                },
+                SOAPAction: {
+                    type: 'string',
+                    title: 'SOAP Action',
+                    description: 'Provide SOAP Action',
+                    required: true,
+                },
+                SOAPBody: {
+                    type: 'string',
+                    title: 'SOAP Body',
+                    description: 'Provide SOAP Body',
+                    required: true,
+                },
+                headers: {
+                    type: 'string',
+                    title: 'Request header',
+                    description: 'Provide headers as json object',
+                    defaultValue: '{ "Accept" : "application/json" }'
+                },
+                jsonPath: {
+                    type: 'string',
+                    title: 'JSON Path',
+                    description: 'Provide JSON Path to filter out data',
+                    defaultValue: '$.[2].title.'
+                },
+                displayAs: {
+                    type: 'string',
+                    title: 'Display As',
+                    enum: ['Label', 'Dropdown', 'Label using Mustache Template'],
+                    description: 'Provide display type of the control',
+                    defaultValue: 'Label'
+                },
+                mustacheTemplate: {
+                    type: 'string',
+                    title: 'Mustache Template',
+                    description: 'Provide Mustache template (applicable for selected display type)',
+                    defaultValue: ''
+                },
+                outcome: {
+                    type: 'string',
+                    title: 'Outcome',
+                    description: 'If set, the value will be overridden by api response',
+                    isValueField: true
                 }
-            }
+            },
+            events: ["ntx-value-change"],
         };
     }
+    static styles = css`
+    select.webapi-control {            
+      border-radius: var(--ntx-form-theme-border-radius);
+      font-size: var(--ntx-form-theme-text-input-size);
+      caret-color: var(--ntx-form-theme-color-input-text);
+      color: var(--ntx-form-theme-color-input-text);
+      border-color: var(--ntx-form-theme-color-border);
+      font-family: var(--ntx-form-theme-font-family);
+      background-color: var(--ntx-form-theme-color-input-background);
+      line-height: var(--ntx-form-control-line-height, 1.25);
+      min-height: 33px;
+      height: auto;
+      padding: 0.55rem;
+      border: 1px solid #898f94;
+      min-width: 70px;
+      position: relative;
+      display: block;
+      box-sizing: border-box;
+      width:100%;
+      appearance: none;
+      background-image: url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E);
+      background-repeat: no-repeat;
+      background-position: right 0.7rem top 50%;
+      background-size: 0.65rem auto;
+    }
+    div.webapi-control{
+      padding: 4px 0px 3px;
+      color: #000;
+    }
+  `;
 
     constructor() {
         super();
-        this.who = 'World';
+        this.message = 'Loading...';
         this.response = '';
-        this.jsonData=null;
+        this.jsonData = null;
     }
-
+    _propagateOutcomeChanges(targetValue) {
+        const args = {
+            bubbles: true,
+            cancelable: false,
+            composed: true,
+            detail: targetValue,
+        };
+        const event = new CustomEvent('ntx-value-change', args);
+        this.dispatchEvent(event);
+    }
     connectedCallback() {
+        if (this.pluginLoaded) {
+            return;
+        }
+        this.pluginLoaded = true;
         super.connectedCallback();
-        console.log("Calling SOAP endpoint - start");
-        this.makeSoapRequest();
-        console.log("Calling SOAP endpoint - end");
+        if (!this.serviceID) {
+            this.message = "Service ID is required.";
+            return;
+        }
+        if (!this.servicePassword) {
+            this.message = "Service Password is required.";
+            return;
+        }
+        if (!this.eradNamespaceURI) {
+            this.message = "Namespace URI for erad is required.";
+            return;
+        }
+        if (!this.SOAPAction) {
+            this.message = "SOAP Action is required.";
+            return;
+        }
+        if (!this.SOAPBody) {
+            this.message = "SOAP Body is required.";
+            return;
+
+        }
+        if (!this.endpointUrl) {
+            this.message = "SOAP Endpoint is required.";
+            return;
+        }
+        else {
+            console.log("Calling SOAP endpoint - start");
+            this.makeSoapRequest();
+            console.log("Calling SOAP endpoint - end");
+        }
     }
 
     // Send SOAP request when the component is first updated 
@@ -56,10 +204,10 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     }
 
     async makeSoapRequest() {
-        const serviceID = 'era-pmt-branchinfo-serviceid';
-        const servicePassword = '_pkJ59$=XVs.gWM7wP:539p$_$@]uX';
+        const serviceID = this.serviceID;
+        const servicePassword = this.servicePassword;
         const soapEnvelope = `
-      <soapenv:Envelope xmlns:erad="http://www.pnc.com/pmt/ERADBLookupService" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+      <soapenv:Envelope xmlns:erad="${this.eradNamespaceURI}" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
         <soapenv:Header>
           <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
             <wsse:UsernameToken wsu:Id="UsernameToken-4EC151B4BE18CC0AB515084488315391">
@@ -69,41 +217,15 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
           </wsse:Security>
         </soapenv:Header>
         <soapenv:Body>
-          <erad:MarketNameRequest>
-            <erad:listMarkets>true</erad:listMarkets>
-            <erad:listFutureMarkets>false</erad:listFutureMarkets>
-          </erad:MarketNameRequest>
+          ${this.SOAPBody}
         </soapenv:Body>
       </soapenv:Envelope>`;
-        // const serviceID='ERA-PMT-PNCIHierarchyInfo-serviceID';
-        // const servicePassword='R404?d!$5dsiC3YagT+1A$M*iSUcqZ';
-        // const nonce='BwFC2HW6jfMgHr/N9OCyfw==';
-        // const createdDate='2017-12-14T21:23:28.843Z';
-        // const repIDInfo='1234';
-        //  const soapEnvelope = `<soapenv:Envelope xmlns:get="http://www.pnc.com/pmt/GetRKIInfoService" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-        //        <soapenv:Header>
-        //        <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-        //            <wsse:UsernameToken wsu:Id="UsernameToken-1">
-        //                <wsse:Username>${serviceID}</wsse:Username>
-        //                <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${servicePassword}</wsse:Password>
-        //                <wsse:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">${nonce}</wsse:Nonce>
-        //                <wsu:Created>${createdDate}</wsu:Created>
-        //            </wsse:UsernameToken>
-        //        </wsse:Security>
-        //        </soapenv:Header>
-        //        <soapenv:Body>
-        //            <get:PNCIHierarchyInfoRequest><get:rep_id>${repIDInfo}</get:rep_id></get:PNCIHierarchyInfoRequest>
-        //         </soapenv:Body>
-        //    </soapenv:Envelope>`;
-
         try {
-            const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-eradblookupservice', {
-                // const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-getrkiinfoService', {
+            const response = await fetch(this.endpointUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/xml; charset="utf-8"',
-                    'SOAPAction': 'getMarketNameList',
-                    // 'SOAPAction': 'getPNCIHierarchyInfo',
+                    'SOAPAction': this.SOAPAction,
                 },
                 body: soapEnvelope,
             });
@@ -111,10 +233,9 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             if (response.ok) {
                 const xml = await response.text();
                 this.response = xml;
-                var jsonData=this.parseXmlToJson(xml);
-                jsonData=this.filterJson(jsonData);
+                var jsonData = this.parseXmlToJson(xml);
+                jsonData = this.filterJson(jsonData);
                 console.log(jsonData);
-                // Handle the XML response here
                 this.plugToForm(jsonData);
             } else {
                 this.response = 'Error: ' + response.statusText;
@@ -178,118 +299,117 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         return obj;
 
     }
-   
+
     parseXmlToJson(xmlResponse) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
         this.jsonData = this.xmlToJson(xmlDoc);
         return this.jsonData;
     }
-    filterJson(jsonData){     
-        if(!this.jsonPath){
-          this.jsonPath = "$."
-        }        
-        if(jsonData){         
-            var result = JSONPath({path: this.jsonPath, json: jsonData});        
+    filterJson(jsonData) {
+        if (!this.jsonPath) {
+            this.jsonPath = "$."
+        }
+        if (jsonData) {
+            var result = JSONPath({ path: this.jsonPath, json: jsonData });
             if (result.length == 1 && this.jsonPath.endsWith(".")) {
                 result = result[0]
-              }        
+            }
             return result;
         }
-      }
-     plugToForm(jsonData){      
-    if(this.displayAs == "Label"){
-      this.constructLabelTemplate(jsonData)
-    }     
-    else if(this.displayAs == "Dropdown"){
-      this.constructDropdownTemplate(jsonData)
-    } 
-    else if(this.displayAs == "Label using Mustache Template"){
-      this.constructLabelUsingMustacheTemplate(jsonData)
-    }         
-    this._propagateOutcomeChanges(this.outcome);
-  }
-
-  constructLabelTemplate(jsonData){            
-      var outputTemplate = "";
-      var htmlTemplate = html``;
-      
-      if(typeof jsonData === 'string' || jsonData instanceof String){
-        outputTemplate = jsonData;
-      }    
-      if(this.isInt(jsonData)){
-        outputTemplate = jsonData.toString();
-      }
-      if(typeof jsonData == 'boolean'){
-        outputTemplate = (jsonData == true ? "true" : "false");
-      }
-      htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
-      
-      this.outcome = outputTemplate;      
-      this.message = html`${htmlTemplate}`            
-  }
-
-  constructDropdownTemplate(items){    
-    if(this.currentPageMode == 'New' || this.currentPageMode == 'Edit'){
-      if(Array.isArray(items)){
-        var itemTemplates = [];
-        for (var i of items) {
-          if(this.currentPageMode == 'Edit' && i == this.outcome){
-            itemTemplates.push(html`<option selected>${i}</option>`);
-          }          
-          else{
-            itemTemplates.push(html`<option>${i}</option>`);
-          }          
+    }
+    plugToForm(jsonData) {
+        if (this.displayAs == "Label") {
+            this.constructLabelTemplate(jsonData)
         }
-        
-        this.message = html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
+        else if (this.displayAs == "Dropdown") {
+            this.constructDropdownTemplate(jsonData)
+        }
+        else if (this.displayAs == "Label using Mustache Template") {
+            this.constructLabelUsingMustacheTemplate(jsonData)
+        }
+        this._propagateOutcomeChanges(this.outcome);
+    }
+
+    constructLabelTemplate(jsonData) {
+        var outputTemplate = "";
+        var htmlTemplate = html``;
+
+        if (typeof jsonData === 'string' || jsonData instanceof String) {
+            outputTemplate = jsonData;
+        }
+        if (this.isInt(jsonData)) {
+            outputTemplate = jsonData.toString();
+        }
+        if (typeof jsonData == 'boolean') {
+            outputTemplate = (jsonData == true ? "true" : "false");
+        }
+        htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
+
+        this.outcome = outputTemplate;
+        this.message = html`${htmlTemplate}`
+    }
+
+    constructDropdownTemplate(items) {
+        if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
+            if (Array.isArray(items)) {
+                var itemTemplates = [];
+                for (var i of items) {
+                    if (this.currentPageMode == 'Edit' && i == this.outcome) {
+                        itemTemplates.push(html`<option selected>${i}</option>`);
+                    }
+                    else {
+                        itemTemplates.push(html`<option>${i}</option>`);
+                    }
+                }
+
+                this.message = html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
                               ${itemTemplates}
                             </select>
-                        `       
-      }
-      else{
-        this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
-      }
-    }    
-    else{
-      this.constructLabelTemplate(this.outcome);
-    }    
-  }
+                        `
+            }
+            else {
+                this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
+            }
+        }
+        else {
+            this.constructLabelTemplate(this.outcome);
+        }
+    }
 
-  constructLabelUsingMustacheTemplate(jsonData){            
-      var rawValue = "";
-      var htmlTemplate = html``;
-      
-      if(typeof jsonData === 'string' || jsonData instanceof String){
-        rawValue = jsonData;
-      }    
-      if(this.isInt(jsonData)){
-        rawValue = jsonData.toString();
-      }
-      if(typeof jsonData == 'boolean'){
-        rawValue = (jsonData == true ? "true" : "false");
-      }
-      if(Array.isArray(jsonData)){
-        rawValue = jsonData;
-      }
-      
-      var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);                     
+    constructLabelUsingMustacheTemplate(jsonData) {
+        var rawValue = "";
+        var htmlTemplate = html``;
 
-      htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
-      
-      this.outcome = rawValue;      
-      this.message = html`${htmlTemplate}`                  
-  }
+        if (typeof jsonData === 'string' || jsonData instanceof String) {
+            rawValue = jsonData;
+        }
+        if (this.isInt(jsonData)) {
+            rawValue = jsonData.toString();
+        }
+        if (typeof jsonData == 'boolean') {
+            rawValue = (jsonData == true ? "true" : "false");
+        }
+        if (Array.isArray(jsonData)) {
+            rawValue = jsonData;
+        }
 
-  isInt(value) {
-    return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
-  }
+        var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);
+
+        htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
+
+        this.outcome = rawValue;
+        this.message = html`${htmlTemplate}`
+    }
+
+    isInt(value) {
+        return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
+    }
 
     render() {
-        return html`
-      <p>Hello ${this.who},</p>
-      <p>Response: ${this.response}</p>
-    `;
+        return html`        
+        <div>${this.message}</div>
+    `
     }
 }
 const elementName = 'preetha-webapi-soap-request-dev';
