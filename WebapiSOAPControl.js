@@ -75,7 +75,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
       </soapenv:Envelope>`;
 
     try {
-      const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-eradblookupservice/', {
+      const response = await fetch('https://pmt-sst-qa.pncint.net/pmt-eradblookupservice', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/xml; charset="utf-8"',
