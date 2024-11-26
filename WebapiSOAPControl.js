@@ -81,7 +81,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                     type: 'string',
                     title: 'Request header',
                     description: 'Provide headers as json object',
-                    defaultValue: '{ "Accept" : "application/json" }'
+                    defaultValue: 'Content-Type: "text/xml"; charset="utf-8"'
                 },
                 jsonPath: {
                     type: 'string',
