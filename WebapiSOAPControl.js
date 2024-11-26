@@ -162,6 +162,8 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             return;
         }
         this.pluginLoaded = true;
+        var currentPageModeIndex = this.queryParam("mode");    
+        this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
         super.connectedCallback();
         if (!this.serviceID) {
             this.message = "Service ID is required.";
@@ -405,6 +407,10 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     isInt(value) {
         return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
     }
+    queryParam(param){    
+        const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
+        return urlParams.get(param); 
+      } 
 
     render() {
         return html`        
