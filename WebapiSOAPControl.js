@@ -156,7 +156,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
 
                 if (!obj[nodeName]) {
 
-                    obj[nodeName] = xmlToJson(child);
+                    obj[nodeName] = this.xmlToJson(child);
 
                 } else {
 
@@ -166,7 +166,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
 
                     }
 
-                    obj[nodeName].push(xmlToJson(child));
+                    obj[nodeName].push(this.xmlToJson(child));
 
                 }
 
