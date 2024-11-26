@@ -110,8 +110,8 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             if (response.ok) {
                 const xml = await response.text();
                 this.response = xml;
-                var jsonData= parseXmlToJson(this.response);
-                jsonData=this.filterJson(jsonData);
+                parseXmlToJson(this.response);
+                var jsonData=this.filterJson(this.response);
                 console.log(jsonData);
                 // Handle the XML response here
             } else {
