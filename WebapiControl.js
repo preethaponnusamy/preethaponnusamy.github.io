@@ -299,6 +299,10 @@ export class OncWebApiRequestDev extends LitElement {
 
   constructDropdownTemplate(items){    
     if(this.currentPageMode == 'New' || this.currentPageMode == 'Edit'){
+      if (typeof items === 'string') {
+        items = [items];
+    }
+
       if(Array.isArray(items)){
         var itemTemplates = [];
         for (var i of items) {
