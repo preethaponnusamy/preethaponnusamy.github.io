@@ -176,9 +176,9 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         return obj;
 
     }
-    parseXmlToJson() {
+    parseXmlToJson(xmlResponse) {
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(this.xmlData, 'text/xml');
+        const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
         this.jsonData = xmlToJson(xmlDoc);
         return this.jsonData;
     }
