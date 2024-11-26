@@ -78,19 +78,19 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
        const nonce='BwFC2HW6jfMgHr/N9OCyfw==';
        const createdDate='2017-12-14T21:23:28.843Z';
        const repIDInfo='1234';
-        const soapEnvelope = `<soapenv:Envelope xmlns:get=\"http://www.pnc.com/pmt/GetRKIInfoService/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">
+        const soapEnvelope = `<soapenv:Envelope xmlns:get="http://www.pnc.com/pmt/GetRKIInfoService" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
               <soapenv:Header>
-              <wsse:Security soapenv:mustUnderstand=\"1\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">
-                  <wsse:UsernameToken wsu:Id=\"UsernameToken-1\">
-                      <wsse:Username>  ${serviceID} </wsse:Username>
-                      <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\"> ${servicePassword} </wsse:Password>
-                      <wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\"> ${nonce}</wsse:Nonce>
-                      <wsu:Created> ${createdDate} </wsu:Created>
+              <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+                  <wsse:UsernameToken wsu:Id="UsernameToken-1">
+                      <wsse:Username>${serviceID}</wsse:Username>
+                      <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${servicePassword}</wsse:Password>
+                      <wsse:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">${nonce}</wsse:Nonce>
+                      <wsu:Created>${createdDate}</wsu:Created>
                   </wsse:UsernameToken>
               </wsse:Security>
               </soapenv:Header>
               <soapenv:Body>
-                  <get:PNCIHierarchyInfoRequest >${repIDInfo} </get:PNCIHierarchyInfoRequest>
+                  <get:PNCIHierarchyInfoRequest>${repIDInfo}</get:PNCIHierarchyInfoRequest>
                </soapenv:Body>
           </soapenv:Envelope>`;
       
