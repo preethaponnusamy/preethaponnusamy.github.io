@@ -115,6 +115,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                 jsonData=this.filterJson(jsonData);
                 console.log(jsonData);
                 // Handle the XML response here
+                this.plugToForm(jsonData);
             } else {
                 this.response = 'Error: ' + response.statusText;
             }
@@ -196,6 +197,93 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             return result;
         }
       }
+     plugToForm(jsonData){      
+    if(this.displayAs == "Label"){
+      this.constructLabelTemplate(jsonData)
+    }     
+    else if(this.displayAs == "Dropdown"){
+      this.constructDropdownTemplate(jsonData)
+    } 
+    else if(this.displayAs == "Label using Mustache Template"){
+      this.constructLabelUsingMustacheTemplate(jsonData)
+    }         
+    this._propagateOutcomeChanges(this.outcome);
+  }
+
+  constructLabelTemplate(jsonData){            
+      var outputTemplate = "";
+      var htmlTemplate = html``;
+      
+      if(typeof jsonData === 'string' || jsonData instanceof String){
+        outputTemplate = jsonData;
+      }    
+      if(this.isInt(jsonData)){
+        outputTemplate = jsonData.toString();
+      }
+      if(typeof jsonData == 'boolean'){
+        outputTemplate = (jsonData == true ? "true" : "false");
+      }
+      htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
+      
+      this.outcome = outputTemplate;      
+      this.message = html`${htmlTemplate}`            
+  }
+
+  constructDropdownTemplate(items){    
+    if(this.currentPageMode == 'New' || this.currentPageMode == 'Edit'){
+      if(Array.isArray(items)){
+        var itemTemplates = [];
+        for (var i of items) {
+          if(this.currentPageMode == 'Edit' && i == this.outcome){
+            itemTemplates.push(html`<option selected>${i}</option>`);
+          }          
+          else{
+            itemTemplates.push(html`<option>${i}</option>`);
+          }          
+        }
+        
+        this.message = html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
+                              ${itemTemplates}
+                            </select>
+                        `       
+      }
+      else{
+        this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
+      }
+    }    
+    else{
+      this.constructLabelTemplate(this.outcome);
+    }    
+  }
+
+  constructLabelUsingMustacheTemplate(jsonData){            
+      var rawValue = "";
+      var htmlTemplate = html``;
+      
+      if(typeof jsonData === 'string' || jsonData instanceof String){
+        rawValue = jsonData;
+      }    
+      if(this.isInt(jsonData)){
+        rawValue = jsonData.toString();
+      }
+      if(typeof jsonData == 'boolean'){
+        rawValue = (jsonData == true ? "true" : "false");
+      }
+      if(Array.isArray(jsonData)){
+        rawValue = jsonData;
+      }
+      
+      var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);                     
+
+      htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
+      
+      this.outcome = rawValue;      
+      this.message = html`${htmlTemplate}`                  
+  }
+
+  isInt(value) {
+    return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
+  }
 
     render() {
         return html`
