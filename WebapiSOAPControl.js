@@ -1,4 +1,5 @@
 import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
+import {JSONPath} from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
 
 export class PreethaWebApiRequestSOAPDev extends LitElement {
 
@@ -180,7 +181,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     parseXmlToJson(xmlResponse) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
-        this.jsonData = xmlToJson(xmlDoc);
+        this.jsonData = this.xmlToJson(xmlDoc);
         return this.jsonData;
     }
     filterJson(jsonData){     
