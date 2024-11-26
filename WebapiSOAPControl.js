@@ -361,7 +361,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     }
 
     constructDropdownTemplate(items) {
-        if (this.sortOptions && Array.isArray(items)) {
+        if (Array.isArray(items)) {
             if (this.sortOrder === 'asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
             } else if (this.sortOrder === 'desc') {
