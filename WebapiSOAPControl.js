@@ -20,7 +20,8 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         currentPageMode: { type: String },
         outcome: { type: String },
         response: { type: String },
-        sortOrder: { type: String }
+        sortOrder: { type: String },
+        defaultMessage:{type:String}
     };
 
     static getMetaConfig() {
@@ -94,6 +95,12 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                     enum: ['Label', 'Dropdown', 'Label using Mustache Template'],
                     description: 'Provide display type of the control',
                     defaultValue: 'Label'
+                },
+                defaultMessage: {
+                    type: 'string',
+                    title: 'Default Option for Dropdown',
+                    description: 'Please provide the default label message',
+                    defaultValue: 'Please select an option'
                 },
                 sortOrder: {
                     type: 'string',
@@ -361,6 +368,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     }
 
     constructDropdownTemplate(items) {
+        
         if (Array.isArray(items)) {
             if (this.sortOrder === 'asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
@@ -371,6 +379,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
             if (Array.isArray(items)) {
                 var itemTemplates = [];
+                itemTemplates.push(html`<option value="" disabled selected>${this.defaultMessage || 'Select an option'}</option>`);
                 for (var i of items) {
                     if (this.currentPageMode == 'Edit' && i == this.outcome) {
                         itemTemplates.push(html`<option selected>${i}</option>`);
