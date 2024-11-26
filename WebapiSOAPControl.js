@@ -90,7 +90,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
               </wsse:Security>
               </soapenv:Header>
               <soapenv:Body>
-                  <get:PNCIHierarchyInfoRequest>${repIDInfo}</get:PNCIHierarchyInfoRequest>
+                  <get:PNCIHierarchyInfoRequest><get:rep_id>${repIDInfo}</get:rep_id></get:PNCIHierarchyInfoRequest>
                </soapenv:Body>
           </soapenv:Envelope>`;
       
