@@ -110,9 +110,9 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             if (response.ok) {
                 const xml = await response.text();
                 this.response = xml;
-                this.test(xml);
-                // var jsonData=this.filterJson(this.response);
-                // console.log(jsonData);
+                var jsonData=this.parseXmlToJson(xml);
+                jsonData=this.filterJson(jsonData);
+                console.log(jsonData);
                 // Handle the XML response here
             } else {
                 this.response = 'Error: ' + response.statusText;
@@ -176,14 +176,12 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         return obj;
 
     }
-    test(xmlResponse){
-        console.log("test function");
-    }
+   
     parseXmlToJson(xmlResponse) {
-        // const parser = new DOMParser();
-        // const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
-        // this.jsonData = xmlToJson(xmlDoc);
-        // return this.jsonData;
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
+        this.jsonData = xmlToJson(xmlDoc);
+        return this.jsonData;
     }
     filterJson(jsonData){     
         if(!this.jsonPath){
