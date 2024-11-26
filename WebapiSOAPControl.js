@@ -1,4 +1,4 @@
-import { LitElement, css, html, unsafeHTML} from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
+import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
 import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
 import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js";
 export class PreethaWebApiRequestSOAPDev extends LitElement {
@@ -19,7 +19,8 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         mustacheTemplate: { type: String },
         currentPageMode: { type: String },
         outcome: { type: String },
-        response: { type: String }
+        response: { type: String },
+        sortOrder: { type: String }
     };
 
     static getMetaConfig() {
@@ -94,6 +95,13 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                     description: 'Provide display type of the control',
                     defaultValue: 'Label'
                 },
+                sortOrder: {
+                    type: 'string',
+                    title: 'Sort Order',
+                    description: 'Sort order of the Dropdown control.',
+                    enum: ['asc', 'desc'],
+                    defaultValue: 'asc'
+                },
                 mustacheTemplate: {
                     type: 'string',
                     title: 'Mustache Template',
@@ -162,7 +170,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
             return;
         }
         this.pluginLoaded = true;
-        var currentPageModeIndex = this.queryParam("mode");    
+        var currentPageModeIndex = this.queryParam("mode");
         this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
         super.connectedCallback();
         if (!this.serviceID) {
@@ -353,6 +361,13 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     }
 
     constructDropdownTemplate(items) {
+        if (this.sortOptions && Array.isArray(items)) {
+            if (this.sortOrder === 'asc') {
+                items.sort((a, b) => a > b ? 1 : -1);
+            } else if (this.sortOrder === 'desc') {
+                items.sort((a, b) => a < b ? 1 : -1);
+            }
+        }
         if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
             if (Array.isArray(items)) {
                 var itemTemplates = [];
@@ -407,10 +422,10 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     isInt(value) {
         return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
     }
-    queryParam(param){    
+    queryParam(param) {
         const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
-        return urlParams.get(param); 
-      } 
+        return urlParams.get(param);
+    }
 
     render() {
         return html`        
