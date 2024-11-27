@@ -113,8 +113,8 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                     type: 'string',
                     title: 'Sort Order',
                     description: 'Sort order of the Dropdown control.',
-                    enum: ['asc', 'desc'],
-                    defaultValue: 'asc'
+                    enum: ['','asc', 'desc'],
+                    defaultValue: ''
                 },
                 mustacheTemplate: {
                     type: 'string',
@@ -370,6 +370,9 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
 
         if (typeof jsonData === 'string' || jsonData instanceof String) {
             outputTemplate = jsonData;
+        }
+        if (typeof jsonData == 'Array'){
+            outputTemplate = jsonData.toString();
         }
         if (this.isInt(jsonData)) {
             outputTemplate = jsonData.toString();
