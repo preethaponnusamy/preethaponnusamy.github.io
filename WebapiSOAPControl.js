@@ -6,12 +6,13 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     static properties = {
         pluginLoaded: { type: Boolean },
         message: { type: String },
-        serviceID: { type: String },
-        servicePassword: { type: String },
         endpointUrl: { type: String },
-        eradNamespaceURI: { type: String },
-        SOAPAction: { type: String },
-        SOAPBody: { type: String },
+        // serviceID: { type: String },
+        // servicePassword: { type: String },
+        // eradNamespaceURI: { type: String },
+        // SOAPBody: { type: String },
+        soapEnvelope: { type: String },
+        soapAction: { type: String },
         headers: { type: String },
         isIntegratedAuth: { type: Boolean },
         jsonPath: { type: String },
@@ -21,7 +22,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         outcome: { type: String },
         response: { type: String },
         sortOrder: { type: String },
-        defaultMessage:{type:String}
+        defaultMessage: { type: String }
     };
 
     static getMetaConfig() {
@@ -40,18 +41,30 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                 visibility: true
             },
             properties: {
-                serviceID: {
-                    type: 'string',
-                    title: 'Service ID',
-                    description: 'Provide Service ID',
-                    required: true,
-                },
-                servicePassword: {
-                    type: 'string',
-                    title: 'Service Password',
-                    description: 'Provide Service Password',
-                    required: true,
-                },
+                // serviceID: {
+                //     type: 'string',
+                //     title: 'Service ID',
+                //     description: 'Provide Service ID',
+                //     required: true,
+                // },
+                // servicePassword: {
+                //     type: 'string',
+                //     title: 'Service Password',
+                //     description: 'Provide Service Password',
+                //     required: true,
+                // },
+                // eradNamespaceURI: {
+                //     type: 'string',
+                //     title: 'Namespace URI for erad',
+                //     description: 'Provide Namespace URI for erad',
+                //     required: true,
+                // },
+                // SOAPBody: {
+                //     type: 'string',
+                //     title: 'SOAP Body',
+                //     description: 'Provide SOAP Body',
+                //     required: true,
+                // },
                 endpointUrl: {
                     type: 'string',
                     title: 'SOAP Endpoint',
@@ -59,22 +72,16 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
                     required: true,
                     defaultValue: 'https://jsonplaceholder.typicode.com/todos'
                 },
-                eradNamespaceURI: {
+                soapEnvelope: {
                     type: 'string',
-                    title: 'Namespace URI for erad',
-                    description: 'Provide Namespace URI for erad',
+                    title: 'SOAP Envelope',
+                    description: 'Provide SOAP Envelope',
                     required: true,
                 },
-                SOAPAction: {
+                soapAction: {
                     type: 'string',
                     title: 'SOAP Action',
                     description: 'Provide SOAP Action',
-                    required: true,
-                },
-                SOAPBody: {
-                    type: 'string',
-                    title: 'SOAP Body',
-                    description: 'Provide SOAP Body',
                     required: true,
                 },
                 headers: {
@@ -180,26 +187,34 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         var currentPageModeIndex = this.queryParam("mode");
         this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
         super.connectedCallback();
-        if (!this.serviceID) {
-            this.message = "Service ID is required.";
+        // if (!this.serviceID) {
+        //     this.message = "Service ID is required.";
+        //     return;
+        // }
+        // if (!this.servicePassword) {
+        //     this.message = "Service Password is required.";
+        //     return;
+        // }
+        // if (!this.eradNamespaceURI) {
+        //     this.message = "Namespace URI for erad is required.";
+        //     return;
+        // }
+        // if (!this.SOAPAction) {
+        //     this.message = "SOAP Action is required.";
+        //     return;
+        // }
+        // if (!this.SOAPBody) {
+        //     this.message = "SOAP Body is required.";
+        //     return;
+
+        // }
+        if (!this.soapEnvelope) {
+            this.message = "SOAP Envelope is required.";
             return;
         }
-        if (!this.servicePassword) {
-            this.message = "Service Password is required.";
-            return;
-        }
-        if (!this.eradNamespaceURI) {
-            this.message = "Namespace URI for erad is required.";
-            return;
-        }
-        if (!this.SOAPAction) {
+        if (!this.soapAction) {
             this.message = "SOAP Action is required.";
             return;
-        }
-        if (!this.SOAPBody) {
-            this.message = "SOAP Body is required.";
-            return;
-
         }
         if (!this.endpointUrl) {
             this.message = "SOAP Endpoint is required.";
@@ -221,30 +236,31 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
     }
 
     async makeSoapRequest() {
-        const serviceID = this.serviceID;
-        const servicePassword = this.servicePassword;
-        const soapEnvelope = `
-      <soapenv:Envelope xmlns:erad="${this.eradNamespaceURI}" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-        <soapenv:Header>
-          <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-            <wsse:UsernameToken wsu:Id="UsernameToken-4EC151B4BE18CC0AB515084488315391">
-              <wsse:Username>${serviceID}</wsse:Username>
-              <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${servicePassword}</wsse:Password>
-            </wsse:UsernameToken>
-          </wsse:Security>
-        </soapenv:Header>
-        <soapenv:Body>
-          ${this.SOAPBody}
-        </soapenv:Body>
-      </soapenv:Envelope>`;
+        // const serviceID = this.serviceID;
+        // const servicePassword = this.servicePassword;
+        //     const soapEnvelope = `
+        //   <soapenv:Envelope xmlns:erad="${this.eradNamespaceURI}" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+        //     <soapenv:Header>
+        //       <wsse:Security soapenv:mustUnderstand="1" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+        //         <wsse:UsernameToken wsu:Id="UsernameToken-4EC151B4BE18CC0AB515084488315391">
+        //           <wsse:Username>${serviceID}</wsse:Username>
+        //           <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText">${servicePassword}</wsse:Password>
+        //         </wsse:UsernameToken>
+        //       </wsse:Security>
+        //     </soapenv:Header>
+        //     <soapenv:Body>
+        //       ${this.SOAPBody}
+        //     </soapenv:Body>
+        //   </soapenv:Envelope>`;
+        const soapEnvelopeData = this.soapEnvelope;
         try {
             const response = await fetch(this.endpointUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/xml; charset="utf-8"',
-                    'SOAPAction': this.SOAPAction,
+                    'SOAPAction': this.soapAction,
                 },
-                body: soapEnvelope,
+                body: soapEnvelopeData,
             });
 
             if (response.ok) {
