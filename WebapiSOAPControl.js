@@ -371,7 +371,7 @@ export class PreethaWebApiRequestSOAPDev extends LitElement {
         if (typeof jsonData === 'string' || jsonData instanceof String) {
             outputTemplate = jsonData;
         }
-        if (typeof jsonData == 'Array'){
+        if (typeof jsonData == 'object'){
             outputTemplate = jsonData.toString();
         }
         if (this.isInt(jsonData)) {
