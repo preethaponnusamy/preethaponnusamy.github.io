@@ -10,11 +10,11 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
     webApiUrl: { type: String },
     headers: { type: String },
     isIntegratedAuth: { type: Boolean },
-    jsonPaths: { type: Array },
-    displayAs: { type: Array },
-    mustacheTemplate: { type: String },
-    currentPageMode: { type: String },
-    outcome: { type: String }
+    // jsonPaths: { type: Array },
+    // displayAs: { type: Array },
+    // mustacheTemplate: { type: String },
+    // currentPageMode: { type: String },
+    // outcome: { type: String }
   };
 
   static getMetaConfig() {
@@ -52,35 +52,35 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
           description: 'Check yes for Windows Integrated Auth',
           defaultValue: false
         },
-        jsonPaths: {
-          type: 'array',
-          title: 'JSON Path Array',
-          description: 'Provide JSON Paths to retrieve dynamic properties (e.g., $.market, $.cities, $.countries)',
-          items: { type: 'string' },
-          defaultValue: ['$']
-        },
-        displayAs: {
-          type: 'array',
-          title: 'Display As Array',
-          description: 'Specify how each property should be displayed (e.g., Label, Dropdown)',
-          items: {
-            type: 'string',
-            enum: ['Label', 'Dropdown']
-          },
-          defaultValue: ['Label']
-        },
-        mustacheTemplate: {
-          type: 'string',
-          title: 'Mustache Template',
-          description: 'Provide Mustache template (applicable for selected display type)',
-          defaultValue: ''
-        },
-        outcome: {
-          type: 'string',
-          title: 'Outcome',
-          description: 'If set, the value will be overridden by the API response',
-          isValueField: true
-        }
+        // jsonPaths: {
+        //   type: 'array',
+        //   title: 'JSON Path Array',
+        //   description: 'Provide JSON Paths to retrieve dynamic properties (e.g., $.market, $.cities, $.countries)',
+        //   items: { type: 'string' },
+        //   defaultValue: ['$']
+        // },
+        // displayAs: {
+        //   type: 'array',
+        //   title: 'Display As Array',
+        //   description: 'Specify how each property should be displayed (e.g., Label, Dropdown)',
+        //   items: {
+        //     type: 'string',
+        //     enum: ['Label', 'Dropdown']
+        //   },
+        //   defaultValue: ['Label']
+        // },
+        // mustacheTemplate: {
+        //   type: 'string',
+        //   title: 'Mustache Template',
+        //   description: 'Provide Mustache template (applicable for selected display type)',
+        //   defaultValue: ''
+        // },
+        // outcome: {
+        //   type: 'string',
+        //   title: 'Outcome',
+        //   description: 'If set, the value will be overridden by the API response',
+        //   isValueField: true
+        // }
       },
       events: ["ntx-value-change"]
     };
@@ -148,150 +148,150 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
   }
 
   connectedCallback() {
-    if (this.pluginLoaded) {
-      return;
-    }
-    this.pluginLoaded = true;
-    super.connectedCallback();
-    var currentPageModeIndex = this.queryParam("mode");
-    this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"));
-    if (window.location.pathname == "/") {
-      this.message = html`Please configure control`;
-      return;
-    }
+    // if (this.pluginLoaded) {
+    //   return;
+    // }
+    // this.pluginLoaded = true;
+    // super.connectedCallback();
+    // var currentPageModeIndex = this.queryParam("mode");
+    // this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"));
+    // if (window.location.pathname == "/") {
+    //   this.message = html`Please configure control`;
+    //   return;
+    // }
 
-    if (!this.headers) {
-      this.headers = '{ "Accept" : "application/json" }';
-    }
-    if (this.webApiUrl) {
-      if (this.isValidJSON(this.headers)) {
-        this.callApi();
-      } else {
-        this.message = html`Invalid Headers`;
-      }
-    } else {
-      this.message = html`Invalid WebApi Url`;
-    }
+    // if (!this.headers) {
+    //   this.headers = '{ "Accept" : "application/json" }';
+    // }
+    // if (this.webApiUrl) {
+    //   if (this.isValidJSON(this.headers)) {
+    //     this.callApi();
+    //   } else {
+    //     this.message = html`Invalid Headers`;
+    //   }
+    // } else {
+    //   this.message = html`Invalid WebApi Url`;
+    // }
   }
 
   async callApi() {
-    var inputWebApi = this.webApiUrl;
-    if (inputWebApi.indexOf("/_api/web/") == -1 && inputWebApi.indexOf("/_api/site/") == -1) {
-      await this.loadWebApi();
-    } else {
-      var hostWebUrl = this.queryParam("SPHostUrl");
-      var appWebUrl = this.queryParam("SPAppWebUrl");
-      var spoApiUrl = appWebUrl + inputWebApi.replace(hostWebUrl, "").replace("/_api/", "/_api/SP.AppContextSite(@target)/");
-      if (inputWebApi.indexOf("?") == -1) {
-        spoApiUrl = spoApiUrl + "?@target='" + hostWebUrl + "'";
-      } else {
-        spoApiUrl = spoApiUrl + "&@target='" + hostWebUrl + "'";
-      }
-      await this.loadSPOApi(appWebUrl, spoApiUrl);
-    }
+    // var inputWebApi = this.webApiUrl;
+    // if (inputWebApi.indexOf("/_api/web/") == -1 && inputWebApi.indexOf("/_api/site/") == -1) {
+    //   await this.loadWebApi();
+    // } else {
+    //   var hostWebUrl = this.queryParam("SPHostUrl");
+    //   var appWebUrl = this.queryParam("SPAppWebUrl");
+    //   var spoApiUrl = appWebUrl + inputWebApi.replace(hostWebUrl, "").replace("/_api/", "/_api/SP.AppContextSite(@target)/");
+    //   if (inputWebApi.indexOf("?") == -1) {
+    //     spoApiUrl = spoApiUrl + "?@target='" + hostWebUrl + "'";
+    //   } else {
+    //     spoApiUrl = spoApiUrl + "&@target='" + hostWebUrl + "'";
+    //   }
+    //   await this.loadSPOApi(appWebUrl, spoApiUrl);
+    // }
   }
 
   async loadWebApi() {
-    var headers = { 'accept': 'application/json' };
-    var fetchAttributes = { "headers": headers };
-    if (this.isIntegratedAuth) {
-      fetchAttributes = { "headers": headers, "credentials": "include" };
-    }
+    // var headers = { 'accept': 'application/json' };
+    // var fetchAttributes = { "headers": headers };
+    // if (this.isIntegratedAuth) {
+    //   fetchAttributes = { "headers": headers, "credentials": "include" };
+    // }
 
-    var response;
-    try {
-      response = await fetch(`${this.webApiUrl}`, fetchAttributes);
-    } catch (e) {
-      response = { status: "500", statusText: `${e}, Try checking authentication` };
-    }
+    // var response;
+    // try {
+    //   response = await fetch(`${this.webApiUrl}`, fetchAttributes);
+    // } catch (e) {
+    //   response = { status: "500", statusText: `${e}, Try checking authentication` };
+    // }
 
-    if (response.status == 200) {
-      try {
-        var jsonData = await response.json();
-        jsonData = this.filterJson(jsonData);
-      } catch (e) {
-        this.message = html`Invalid JSON response`;
-      }
-      this.plugToForm(jsonData);
-    } else {
-      this.message = html`WebApi request failed: ${response.status} - ${response.statusText || 'Error'}`;
-    }
+    // if (response.status == 200) {
+    //   try {
+    //     var jsonData = await response.json();
+    //     jsonData = this.filterJson(jsonData);
+    //   } catch (e) {
+    //     this.message = html`Invalid JSON response`;
+    //   }
+    //   this.plugToForm(jsonData);
+    // } else {
+    //   this.message = html`WebApi request failed: ${response.status} - ${response.statusText || 'Error'}`;
+    // }
   }
 
   async loadSPOApi(appWebUrl, spoApiUrl) {
-    var response;
-    var fetchAttributes = { "headers": { 'Accept': 'application/json' }, "credentials": "include" };
-    try {
-      response = await fetch(spoApiUrl, fetchAttributes);
-    } catch (e) {
-      response = { status: "500", statusText: `${e}, Try checking authentication` };
-    }
-    if (response.status == 200) {
-      try {
-        var jsonData = await response.json();
-        jsonData = this.filterJson(jsonData);
-      } catch (e) {
-        this.message = html`Invalid JSON response`;
-      }
-      this.plugToForm(jsonData);
-    } else {
-      this.message = html`WebApi request failed: ${response.status} - ${response.statusText || 'Error'}`;
-    }
+    // var response;
+    // var fetchAttributes = { "headers": { 'Accept': 'application/json' }, "credentials": "include" };
+    // try {
+    //   response = await fetch(spoApiUrl, fetchAttributes);
+    // } catch (e) {
+    //   response = { status: "500", statusText: `${e}, Try checking authentication` };
+    // }
+    // if (response.status == 200) {
+    //   try {
+    //     var jsonData = await response.json();
+    //     jsonData = this.filterJson(jsonData);
+    //   } catch (e) {
+    //     this.message = html`Invalid JSON response`;
+    //   }
+    //   this.plugToForm(jsonData);
+    // } else {
+    //   this.message = html`WebApi request failed: ${response.status} - ${response.statusText || 'Error'}`;
+    // }
   }
 
   plugToForm(jsonData) {
-    if (this.jsonPaths && Array.isArray(this.jsonPaths) && this.displayAs && Array.isArray(this.displayAs)) {
-      this.jsonPaths.forEach((jsonPath, index) => {
-        const fieldValue = this.filterJson(jsonData, jsonPath);
-        const displayType = this.displayAs[index];
+    // if (this.jsonPaths && Array.isArray(this.jsonPaths) && this.displayAs && Array.isArray(this.displayAs)) {
+    //   this.jsonPaths.forEach((jsonPath, index) => {
+    //     const fieldValue = this.filterJson(jsonData, jsonPath);
+    //     const displayType = this.displayAs[index];
 
-        if (displayType === "Label") {
-          this.constructLabelTemplate(fieldValue);
-        } else if (displayType === "Dropdown") {
-          this.constructDropdownTemplate(fieldValue);
-        }
-      });
-    } else {
-      this.message = html`<p>No dynamic fields configured.</p>`;
-    }
-    this._propagateOutcomeChanges(this.outcome);
+    //     if (displayType === "Label") {
+    //       this.constructLabelTemplate(fieldValue);
+    //     } else if (displayType === "Dropdown") {
+    //       this.constructDropdownTemplate(fieldValue);
+    //     }
+    //   });
+    // } else {
+    //   this.message = html`<p>No dynamic fields configured.</p>`;
+    // }
+    // this._propagateOutcomeChanges(this.outcome);
   }
 
   constructLabelTemplate(data) {
-    let outputTemplate = "";
-    if (typeof data === 'string') {
-      outputTemplate = data;
-    } else if (Array.isArray(data)) {
-      outputTemplate = data.join(", ");
-    } else {
-      outputTemplate = JSON.stringify(data);
-    }
-    this.outcome = outputTemplate;
-    this.message = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
+    // let outputTemplate = "";
+    // if (typeof data === 'string') {
+    //   outputTemplate = data;
+    // } else if (Array.isArray(data)) {
+    //   outputTemplate = data.join(", ");
+    // } else {
+    //   outputTemplate = JSON.stringify(data);
+    // }
+    // this.outcome = outputTemplate;
+    // this.message = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
   }
 
   constructDropdownTemplate(items) {
-    if (Array.isArray(items)) {
-      const itemTemplates = items.map(item => html`<option>${item}</option>`);
-      this.message = html`
-        <select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)}>
-          ${itemTemplates}
-        </select>
-      `;
-    } else {
-      this.message = html`<p>Data is not in an array format. Check the configuration.</p>`;
-    }
+    // if (Array.isArray(items)) {
+    //   const itemTemplates = items.map(item => html`<option>${item}</option>`);
+    //   this.message = html`
+    //     <select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)}>
+    //       ${itemTemplates}
+    //     </select>
+    //   `;
+    // } else {
+    //   this.message = html`<p>Data is not in an array format. Check the configuration.</p>`;
+    // }
   }
 
   filterJson(jsonData, jsonPath) {
-    if (!jsonPath) {
-      return jsonData;
-    }
-    const result = JSONPath({ path: jsonPath, json: jsonData });
-    if (result.length === 1 && jsonPath.endsWith(".")) {
-      return result[0];
-    }
-    return result;
+    // if (!jsonPath) {
+    //   return jsonData;
+    // }
+    // const result = JSONPath({ path: jsonPath, json: jsonData });
+    // if (result.length === 1 && jsonPath.endsWith(".")) {
+    //   return result[0];
+    // }
+    // return result;
   }
 
   isValidJSON(str) {
