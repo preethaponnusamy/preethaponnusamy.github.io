@@ -10,7 +10,7 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
     webApiUrl: { type: String },
     headers: { type: String },
     isIntegratedAuth: { type: Boolean },
-    // jsonPaths: { type: Array },
+    jsonPaths: { type: Array },
     // displayAs: { type: Array },
     // mustacheTemplate: { type: String },
     // currentPageMode: { type: String },
