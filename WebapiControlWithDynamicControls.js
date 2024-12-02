@@ -1,9 +1,9 @@
-import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
+import { LitElement, css, html } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
 import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
 import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js";
 
 export class TestWebApiRequestDynamicControlsDev extends LitElement {
-  
+
   static properties = {  
     pluginLoaded: { type: Boolean },  
     message: { type: String },
@@ -15,7 +15,7 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
     mustacheTemplate: { type: String },
     currentPageMode: { type: String },
     outcome: { type: String }
-  }
+  };
 
   static getMetaConfig() {
     return {
@@ -36,14 +36,14 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
         webApiUrl: {
           type: 'string',
           title: 'WebApi Url',
-          description: 'Provide Web api Url',
+          description: 'Provide Web API Url',
           required: true,
           defaultValue: 'https://jsonplaceholder.typicode.com/todos'
         },
         headers: {
           type: 'string',
           title: 'Request header',
-          description: 'Provide headers as json object',
+          description: 'Provide headers as JSON object',
           defaultValue: '{ "Accept" : "application/json" }'
         },
         isIntegratedAuth: {
@@ -104,7 +104,7 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
       position: relative;
       display: block;
       box-sizing: border-box;
-      width:100%;
+      width: 100%;
       appearance: none;
       background-image: url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E);
       background-repeat: no-repeat;
@@ -192,22 +192,20 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
   }
 
   async loadWebApi() {
-    var headers = { 'accept': 'application/json' }
+    var headers = { 'accept': 'application/json' };
     var fetchAttributes = { "headers": headers };
     if (this.isIntegratedAuth) {
-      fetchAttributes = { "headers": headers, "credentials": "include" }
+      fetchAttributes = { "headers": headers, "credentials": "include" };
     }
 
     var response;
     try {
       response = await fetch(`${this.webApiUrl}`, fetchAttributes);
     } catch (e) {
-      response = {}
-      response.status = "500"
-      response.statusText = e + ", Try checking authentication";
+      response = { status: "500", statusText: `${e}, Try checking authentication` };
     }
 
-    if (response != undefined && response.status == 200) {
+    if (response.status == 200) {
       try {
         var jsonData = await response.json();
         jsonData = this.filterJson(jsonData);
@@ -216,21 +214,19 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
       }
       this.plugToForm(jsonData);
     } else {
-      this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error' : response.statusText}`;
+      this.message = html`WebApi request failed: ${response.status} - ${response.statusText || 'Error'}`;
     }
   }
 
   async loadSPOApi(appWebUrl, spoApiUrl) {
     var response;
-    var fetchAttributes = { "headers": { 'Accept': 'application/json' }, "credentials": "include" }
+    var fetchAttributes = { "headers": { 'Accept': 'application/json' }, "credentials": "include" };
     try {
       response = await fetch(spoApiUrl, fetchAttributes);
     } catch (e) {
-      response = {}
-      response.status = "500"
-      response.statusText = e + ", Try checking authentication";
+      response = { status: "500", statusText: `${e}, Try checking authentication` };
     }
-    if (response != undefined && response.status == 200) {
+    if (response.status == 200) {
       try {
         var jsonData = await response.json();
         jsonData = this.filterJson(jsonData);
@@ -239,7 +235,7 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
       }
       this.plugToForm(jsonData);
     } else {
-      this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error' : response.statusText}`;
+      this.message = html`WebApi request failed: ${response.status} - ${response.statusText || 'Error'}`;
     }
   }
 
