@@ -52,13 +52,13 @@ export class TestWebApiRequestDynamicControlsDev extends LitElement {
           description: 'Check yes for Windows Integrated Auth',
           defaultValue: false
         },
-        // jsonPaths: {
-        //   type: 'array',
-        //   title: 'JSON Path Array',
-        //   description: 'Provide JSON Paths to retrieve dynamic properties (e.g., $.market, $.cities, $.countries)',
-        //   items: { type: 'string' },
-        //   defaultValue: ['$']
-        // },
+        jsonPaths: {
+          type: 'array',
+          title: 'JSON Path Array',
+          description: 'Provide JSON Paths to retrieve dynamic properties (e.g., $.market, $.cities, $.countries)',
+          items: { type: 'string' },
+          defaultValue: ['$']
+        },
         // displayAs: {
         //   type: 'array',
         //   title: 'Display As Array',
