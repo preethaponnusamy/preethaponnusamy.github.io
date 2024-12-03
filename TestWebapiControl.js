@@ -269,30 +269,30 @@ export class TestWebApiRequestDev extends LitElement {
   plugToForm(jsonData) {
     var displayType = this.displayAs.split(',');
     var jsonProperties = this.jsonPath.split(',');
-    this.message = '';
+    let output = [];
     displayType.forEach((item, i) => {
 
       if (item == "Label") {
         var data = this.filterJson(jsonData, jsonProperties[i]);
-        this.constructLabelTemplate(data);
+        this.constructLabelTemplate(data,output);
       }
       else if (this.displayAs == "Dropdown") {
         var data = this.filterJson(jsonData, jsonProperties[i]);
-        this.constructDropdownTemplate(data);
+        this.constructDropdownTemplate(data,output);
       }
       else if (this.displayAs == "Label using Mustache Template") {
         var data = this.filterJson(jsonData, jsonProperties[i]);
-        this.constructLabelUsingMustacheTemplate(data);
+        this.constructLabelUsingMustacheTemplate(data,output);
       }
 
     }
     )
-
+    this.message = output;
 
     this._propagateOutcomeChanges(this.outcome);
   }
 
-  constructLabelTemplate(jsonData) {
+  constructLabelTemplate(jsonData,output) {
     var outputTemplate = "";
     var htmlTemplate = html``;
 
@@ -309,10 +309,10 @@ export class TestWebApiRequestDev extends LitElement {
 
     this.outcome = outputTemplate;
 
-    this.message = this.message.concat(html`${htmlTemplate}`);
+    output.push(html`${htmlTemplate}`);
   }
 
-  constructDropdownTemplate(items) {
+  constructDropdownTemplate(items,output) {
     if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
       if (typeof items === 'string') {
         items = [items];
@@ -329,13 +329,13 @@ export class TestWebApiRequestDev extends LitElement {
           }
         }
 
-        this.message = this.message.concat(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
+        output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
                               ${itemTemplates}
                             </select>
                         `);
       }
       else {
-        this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
+        output.push(html`<p>WebApi response not in array. Check WebApi Configuration</p>`);
       }
     }
     else {
@@ -343,7 +343,7 @@ export class TestWebApiRequestDev extends LitElement {
     }
   }
 
-  constructLabelUsingMustacheTemplate(jsonData) {
+  constructLabelUsingMustacheTemplate(jsonData,output) {
     var rawValue = "";
     var htmlTemplate = html``;
 
