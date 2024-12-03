@@ -149,6 +149,14 @@ export class OncWebApiRequestDev extends LitElement {
     super.connectedCallback(); 
     var currentPageModeIndex = this.queryParam("mode");    
     this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
+    document.querySelectorAll('a.nx-command-bar-item[title="Edit"]').forEach(function(element) {
+      element.addEventListener('click', function(event) {
+          // Check if the clicked element's text is "Edit"
+          if (event.target.innerText === "Edit") {
+              this.currentPageMode = "Edit";
+          }
+      });
+  });
     if(window.location.pathname == "/")  {
       this.message = html`Please configure control`      
       return;      
