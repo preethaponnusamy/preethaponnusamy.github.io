@@ -141,7 +141,7 @@ export class OncWebApiRequestDev extends LitElement {
       this.callApi();
     }
   }
-  updatePageMode()
+  updatePageMode(editFlag)
   {
     if(editFlag ==1){
       this.currentPageMode ="Edit";
@@ -161,7 +161,7 @@ export class OncWebApiRequestDev extends LitElement {
         // Check if the clicked element's text is "Edit"
         if (event.target.innerText === "Edit") {
           editFlag=1;
-          this.updatePageMode();
+          this.updatePageMode(editFlag);
           console.log('Page mode set to Edit');
         }
       });
