@@ -309,7 +309,7 @@ export class TestWebApiRequestDev extends LitElement {
 
     this.outcome = outputTemplate;
 
-    this.message.concat(html`${htmlTemplate}`);
+    this.message = this.message.concat(html`${htmlTemplate}`);
   }
 
   constructDropdownTemplate(items) {
@@ -329,13 +329,13 @@ export class TestWebApiRequestDev extends LitElement {
           }
         }
 
-        this.message.concat(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
+        this.message = this.message.concat(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
                               ${itemTemplates}
                             </select>
                         `);
       }
       else {
-        this.message = this.message + html`<p>WebApi response not in array. Check WebApi Configuration</p>`
+        this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
       }
     }
     else {
