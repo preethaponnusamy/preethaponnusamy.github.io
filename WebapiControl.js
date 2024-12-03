@@ -141,6 +141,12 @@ export class OncWebApiRequestDev extends LitElement {
       this.callApi();
     }
   }
+  updatePageMode()
+  {
+    if(editFlag ==1){
+      this.currentPageMode ="Edit";
+    }
+  }
   connectedCallback() {
     if (this.pluginLoaded) {
       return;
@@ -149,15 +155,18 @@ export class OncWebApiRequestDev extends LitElement {
     super.connectedCallback();
     var currentPageModeIndex = this.queryParam("mode");
     this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
+    var editFlag=0;
     document.querySelectorAll('a.nx-command-bar-item[title="Edit"]').forEach(element => {
       element.addEventListener('click', (event) => {
         // Check if the clicked element's text is "Edit"
         if (event.target.innerText === "Edit") {
-          this.currentPageMode = "Edit";
+          editFlag=1;
+          this.updatePageMode();
           console.log('Page mode set to Edit');
         }
       });
     });
+   
     if (window.location.pathname == "/") {
       this.message = html`Please configure control`
       return;
