@@ -178,9 +178,13 @@ export class ONCWebServiceRequestSOAPDev extends LitElement {
         }
     }
 
-    shouldUpdate(changedProperties) {
-        // Always return true to force updates and trigger the updated() lifecycle method
-        return true;
+    set endpointUrl(value) {
+        const oldValue = this._endpointUrl; // Store the previous value
+        if (value !== oldValue) {
+            this._endpointUrl = value; // Update the internal value only if it's different
+        }
+        // Force an update even if the value is the same
+        this.requestUpdate('endpointUrl', oldValue);
     }
     // Send SOAP request when the component is first updated 
     updated(changedProperties) {
