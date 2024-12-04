@@ -178,6 +178,10 @@ export class ONCWebServiceRequestSOAPDev extends LitElement {
         }
     }
 
+    shouldUpdate(changedProperties) {
+        // Always return true to force updates and trigger the updated() lifecycle method
+        return true;
+    }
     // Send SOAP request when the component is first updated 
     updated(changedProperties) {
         super.updated(changedProperties);
