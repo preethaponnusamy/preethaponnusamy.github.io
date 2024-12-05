@@ -33,5 +33,5 @@ export class TestBasicPlugin extends LitElement {
 }
 
 // registering the web component
-const elementName = 'testplugin';
+const elementName = 'testplugin-test';
 customElements.define(elementName, TestBasicPlugin);
