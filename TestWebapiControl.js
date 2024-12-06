@@ -78,8 +78,7 @@ export class TestWebApiRequestDev extends LitElement {
                     isValueField: true
                 }
             },
-            events: ["ntx-value-change","dropdown1-change"],
-            //, "dropdown2-change"],
+            events: ["ntx-value-change"]
         };
     }
 
@@ -142,18 +141,11 @@ export class TestWebApiRequestDev extends LitElement {
             bubbles: true,
             cancelable: false,
             composed: true,
-            detail: targetValue,
+            detail: ["Preetha","USA"],
         };
         const event = new CustomEvent('ntx-value-change', args);
-        // this.dispatchEvent(event);
-        const event2 = new CustomEvent('dropdown1-change', {
-            bubbles: true,
-            cancelable: false,
-            composed: true,
-            detail: "500 Commerce street"
-        });
-        //this.dispatchEvent(event);
-        this.dispatchEvent(event2);
+        this.dispatchEvent(event);
+        
     }
     updated(changedProperties) {
         super.updated(changedProperties);
