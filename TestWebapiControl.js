@@ -78,8 +78,8 @@ export class TestWebApiRequestDev extends LitElement {
                     isValueField: true
                 }
             },
-            events: ["ntx-value-change"],
-            //, "dropdown1-change", "dropdown2-change"],
+            events: ["ntx-value-change","dropdown1-change"],
+            //, "dropdown2-change"],
         };
     }
 
@@ -152,7 +152,8 @@ export class TestWebApiRequestDev extends LitElement {
             composed: true,
             detail: "500 Commerce street"
         });
-        this.dispatchEvent.Array([event,event2]);
+        this.dispatchEvent(event);
+        this.dispatchEvent(event2);
     }
     updated(changedProperties) {
         super.updated(changedProperties);
