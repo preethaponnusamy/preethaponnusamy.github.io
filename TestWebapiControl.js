@@ -14,7 +14,8 @@ export class TestWebApiRequestDev extends LitElement {
         displayAs: { type: String },
         mustacheTemplate: { type: String },
         currentPageMode: { type: String },
-        outcome: { type: String }
+        outcome: { type: String },
+        test: { type: Object }
     }
 
     static getMetaConfig() {
@@ -71,12 +72,29 @@ export class TestWebApiRequestDev extends LitElement {
                     description: 'Provide Mustache template (applicable for selected display type)',
                     defaultValue: ''
                 },
-                outcome: {
-                    type: 'string',
-                    title: 'Outcome',
-                    description: 'If set, the value will be overridden by api response',
-                    isValueField: true
+                // outcome: {
+                //     type: 'string',
+                //     title: 'Outcome',
+                //     description: 'If set, the value will be overridden by api response',
+                //     isValueField: true
+                // },
+                test: {
+                    type: 'object',
+                    title: 'test',
+                    properties: {
+                        id: {
+                            type: 'integer',
+                            description: 'ID',
+                            title: 'ID',
+                        },
+                        title: {
+                            type: 'string',
+                            description: 'Title',
+                            title: 'Title',
+                        },
+                    },
                 }
+
             },
             events: ["ntx-value-change"],
         };
@@ -272,7 +290,7 @@ export class TestWebApiRequestDev extends LitElement {
         let output = [];
         displayType.forEach((item, i) => {
 
-            if (item.toLowerCase()== "label") {
+            if (item.toLowerCase() == "label") {
                 var data = this.filterJson(jsonData, jsonProperties[i]);
                 this.constructLabelTemplate(data, output);
             }
@@ -288,10 +306,10 @@ export class TestWebApiRequestDev extends LitElement {
         }
         )
         this.message = output;
-
-        this._propagateOutcomeChanges(this.outcome);
+        // this._propagateOutcomeChanges(this.outcome);
+        this._propagateOutcomeChanges(this.test);
     }
-  
+
     constructLabelTemplate(jsonData, output) {
         var outputTemplate = "";
         var htmlTemplate = html``;
@@ -307,7 +325,8 @@ export class TestWebApiRequestDev extends LitElement {
         }
         htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
 
-        this.outcome = outputTemplate;
+        // this.outcome = outputTemplate;
+        this.test=outputTemplate;
 
         output.push(html`${htmlTemplate}`);
     }
@@ -321,7 +340,7 @@ export class TestWebApiRequestDev extends LitElement {
             if (Array.isArray(items)) {
                 var itemTemplates = [];
                 for (var i of items) {
-                    if (this.currentPageMode == 'Edit' && i == this.outcome) {
+                    if (this.currentPageMode == 'Edit' && i == this.test) {
                         itemTemplates.push(html`<option selected>${i}</option>`);
                     }
                     else {
@@ -339,7 +358,7 @@ export class TestWebApiRequestDev extends LitElement {
             }
         }
         else {
-            this.constructLabelTemplate(this.outcome);
+            this.constructLabelTemplate(this.test);
         }
     }
 
@@ -364,7 +383,7 @@ export class TestWebApiRequestDev extends LitElement {
 
         htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
 
-        this.outcome = rawValue;
+        this.test = rawValue;
         output.push(html`${htmlTemplate}`);
     }
     isInt(value) {
