@@ -139,7 +139,7 @@ export class TestWebApiRequestDev extends LitElement {
 
     render() {
         return html`        
-        <div>${this.message}</div>
+        <div>${this.test}</div>
     `
     }
 
