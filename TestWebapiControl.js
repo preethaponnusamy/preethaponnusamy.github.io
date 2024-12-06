@@ -1,6 +1,6 @@
 import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
 import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
-import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"
+import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js";
 
 export class TestWebApiRequestDev extends LitElement {
 
@@ -61,7 +61,6 @@ export class TestWebApiRequestDev extends LitElement {
                 displayAs: {
                     type: 'string',
                     title: 'Display As',
-                    // enum: ['Label', 'Dropdown', 'Label using Mustache Template'],
                     description: 'Provide display type of the control',
                     defaultValue: 'Label'
                 },
@@ -78,7 +77,7 @@ export class TestWebApiRequestDev extends LitElement {
                     isValueField: true
                 }
             },
-            events: ["ntx-value-change"],
+            events: ["ntx-value-change", "dropdown1-change", "dropdown2-change"], // Define additional events for individual dropdowns
         };
     }
 
@@ -125,22 +124,25 @@ export class TestWebApiRequestDev extends LitElement {
     `
     }
 
-    _propagateOutcomeChanges(targetValue, fieldName) {
-        const args = {
+    // Trigger change event for a dropdown
+    _triggerDropdownChange(dropdownName, value) {
+        const eventDetail = { [dropdownName]: value };
+        const event = new CustomEvent(`${dropdownName}-change`, {
             bubbles: true,
-            cancelable: false,
+            cancelable: true,
             composed: true,
-            detail: { fieldName, value: targetValue },
-        };
-        const event = new CustomEvent('ntx-value-change', args);
+            detail: eventDetail
+        });
         this.dispatchEvent(event);
     }
+
     updated(changedProperties) {
         super.updated(changedProperties);
         if (changedProperties.has('webApiUrl')) {
             this.callApi();
         }
     }
+
     connectedCallback() {
         if (this.pluginLoaded) {
             return;
@@ -170,151 +172,8 @@ export class TestWebApiRequestDev extends LitElement {
         }
     }
 
-    async callApi() {
-        var inputWebApi = this.webApiUrl;
-        if (inputWebApi.indexOf("/_api/web/") == -1 && inputWebApi.indexOf("/_api/site/") == -1) {
-            await this.loadWebApi();
-        }
-        else {
-            var hostWebUrl = this.queryParam("SPHostUrl");
-            var appWebUrl = this.queryParam("SPAppWebUrl");
-            var spoApiUrl = appWebUrl + inputWebApi.replace(hostWebUrl, "").replace("/_api/", "/_api/SP.AppContextSite(@target)/")
-            if (inputWebApi.indexOf("?") == -1) {
-                spoApiUrl = spoApiUrl + "?@target='" + hostWebUrl + "'";
-            }
-            else {
-                spoApiUrl = spoApiUrl + "&@target='" + hostWebUrl + "'";
-            }
-            await this.loadSPOApi(appWebUrl, spoApiUrl);
-        }
-
-    }
-
-    async executeAsyncWithPromise(appWebUrl, requestInfo) {
-        return new Promise((resolve, reject) => {
-            const executor = new SP.RequestExecutor(appWebUrl);
-            executor.executeAsync({
-                ...requestInfo,
-                success: (response) => resolve(response),
-                error: (response) => reject(response),
-            });
-        });
-    }
-
-    async loadSPOApi(appWebUrl, spoApiUrl) {
-        const requestInfo = {
-            url: spoApiUrl,
-            method: "GET",
-            headers: { "Accept": "application/json; odata=verbose" }
-        };
-
-        var response;
-        try {
-            response = await this.executeAsyncWithPromise(appWebUrl, requestInfo);
-        }
-        catch (e) {
-            response = {}
-            response.status = "500"
-            response.statusText = e + ", Try checking end point";
-        }
-
-        if (response.body != undefined && response.statusCode == 200) {
-            try {
-                var jsonData = JSON.parse(response.body);
-                jsonData = this.filterJson(jsonData);
-            }
-            catch (e) {
-                this.message = html`Invalid JSON response`
-            }
-            this.plugToForm(jsonData);
-        }
-        else {
-            this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
-        }
-    }
-
-    async loadWebApi() {
-        var headers = { 'accept': 'application/json' }
-        var fetchAttributes = { "headers": headers };
-        if (this.isIntegratedAuth) {
-            fetchAttributes = { "headers": headers, "credentials": "include" }
-        }
-
-        var response;
-        try {
-            response = await fetch(`${this.webApiUrl}`, fetchAttributes);
-        }
-        catch (e) {
-            response = {}
-            response.status = "500"
-            response.statusText = e + ", Try checking authentication";
-        }
-
-        if (response != undefined && response.status == 200) {
-            try {
-                var jsonData = await response.json();
-                // jsonData = this.filterJson(jsonData);        
-            }
-            catch (e) {
-                this.message = html`Invalid JSON response`
-            }
-            this.plugToForm(jsonData);
-        }
-        else {
-            this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
-        }
-
-    }
-
-    plugToForm(jsonData) {
-        var displayType = this.displayAs.split(',');
-        var jsonProperties = this.jsonPath.split(',');
-        let output = [];
-
-        displayType.forEach((item, i) => {
-            const fieldName = `field_${i + 1}`;
-            if (item.toLowerCase() == "label") {
-                var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructLabelTemplate(data, output,fieldName);
-            }
-            else if (item.toLowerCase() == "dropdown") {
-                var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructDropdownTemplate(data, output,fieldName);
-            }
-            else if (item.toLowerCase() == "Label using Mustache Template") {
-                var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructLabelUsingMustacheTemplate(data, output,fieldName);
-            }
-
-        }
-        )
-        this.message = output;
-
-        // this._propagateOutcomeChanges(this.outcome);
-    }
-
-    constructLabelTemplate(jsonData, output, fieldName) {
-        var outputTemplate = "";
-        var htmlTemplate = html``;
-
-        if (typeof jsonData === 'string' || jsonData instanceof String) {
-            outputTemplate = jsonData;
-        }
-        if (this.isInt(jsonData)) {
-            outputTemplate = jsonData.toString();
-        }
-        if (typeof jsonData == 'boolean') {
-            outputTemplate = (jsonData == true ? "true" : "false");
-        }
-        htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
-
-        this.outcome = outputTemplate;
-
-        output.push(html`${htmlTemplate}`);
-        this._propagateOutcomeChanges(outputTemplate, fieldName);
-    }
-
-    constructDropdownTemplate(items, output,fieldName) {
+    // This function is called when the dropdown changes (e.g., user selects a value)
+    constructDropdownTemplate(items, output) {
         if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
             if (typeof items === 'string') {
                 items = [items];
@@ -331,77 +190,54 @@ export class TestWebApiRequestDev extends LitElement {
                     }
                 }
 
-                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value,fieldName)} >
+                output.push(html`<select class="form-control webapi-control" @change=${e => this._triggerDropdownChange('dropdown1', e.target.value)} >
                               ${itemTemplates}
                             </select>
                         `);
-                        this._propagateOutcomeChanges(items[0], fieldName);  
             }
             else {
-                output.push(html`<p>WebApi response not in array. Check WebApi Configuration</p>`);
+                output.push(html`<p>WebApi response not returning any data.</p>`);
             }
         }
-        else {
-            this.constructLabelTemplate(items,output,fieldName);
-        }
     }
 
-    constructLabelUsingMustacheTemplate(jsonData, output,fieldName) {
-        var rawValue = "";
-        var htmlTemplate = html``;
+    // Make the API call
+    callApi() {
+        this.outcome = "";
+        const headersJson = this.isValidJSON(this.headers) ? JSON.parse(this.headers) : {};
 
-        if (typeof jsonData === 'string' || jsonData instanceof String) {
-            rawValue = jsonData;
-        }
-        if (this.isInt(jsonData)) {
-            rawValue = jsonData.toString();
-        }
-        if (typeof jsonData == 'boolean') {
-            rawValue = (jsonData == true ? "true" : "false");
-        }
-        if (Array.isArray(jsonData)) {
-            rawValue = jsonData;
-        }
-
-        var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);
-
-        htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
-
-        this.outcome = rawValue;
-        output.push(html`${htmlTemplate}`);
-        this._propagateOutcomeChanges(outputTemplate, fieldName);
-    }
-    isInt(value) {
-        return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
-    }
-
-    filterJson(jsonData, jsonProperty) {
-        if (!jsonProperty) {
-            jsonProperty = "$."
-        }
-        if (jsonData) {
-            var result = JSONPath({ path: jsonProperty, json: jsonData });
-            if (result.length == 1 && jsonProperty.endsWith(".")) {
-                result = result[0]
-            }
-            return result;
-        }
+        fetch(this.webApiUrl, {
+            method: 'GET',
+            headers: headersJson
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (this.jsonPath) {
+                    const jsonPathData = JSONPath({ path: this.jsonPath, json: data });
+                    this.outcome = jsonPathData;
+                    this.message = html`Data has been fetched and filtered based on JSON path.`;
+                }
+                else {
+                    this.outcome = data;
+                    this.message = html`Data has been fetched.`;
+                }
+                this.requestUpdate();
+            })
+            .catch(err => {
+                console.error('Error fetching data:', err);
+                this.message = html`Error fetching data: ${err.message}`;
+            });
     }
 
+    // Utility method to check if JSON string is valid
     isValidJSON(str) {
         try {
             JSON.parse(str);
-            return true;
         } catch (e) {
             return false;
         }
+        return true;
     }
-
-    queryParam(param) {
-        const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
-        return urlParams.get(param);
-    }
-
 }
 
-customElements.define('test-webservice-request-dev', TestWebApiRequestDev);
+customElements.define('test-webapi-request-dev', TestWebApiRequestDev);
