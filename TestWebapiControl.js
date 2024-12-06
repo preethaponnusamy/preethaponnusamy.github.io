@@ -14,8 +14,7 @@ export class TestWebApiRequestDev extends LitElement {
         displayAs: { type: String },
         mustacheTemplate: { type: String },
         currentPageMode: { type: String },
-        outcome: { type: String },
-        test: { type: Object }
+        outcome: { type: String }
     }
 
     static getMetaConfig() {
@@ -72,29 +71,12 @@ export class TestWebApiRequestDev extends LitElement {
                     description: 'Provide Mustache template (applicable for selected display type)',
                     defaultValue: ''
                 },
-                // outcome: {
-                //     type: 'string',
-                //     title: 'Outcome',
-                //     description: 'If set, the value will be overridden by api response',
-                //     isValueField: true
-                // },
-                test: {
-                    type: 'object',
-                    title: 'test',
-                    properties: {
-                        id: {
-                            type: 'integer',
-                            description: 'ID',
-                            title: 'ID',
-                        },
-                        title: {
-                            type: 'string',
-                            description: 'Title',
-                            title: 'Title',
-                        },
-                    },
+                outcome: {
+                    type: 'string',
+                    title: 'Outcome',
+                    description: 'If set, the value will be overridden by api response',
+                    isValueField: true
                 }
-
             },
             events: ["ntx-value-change"],
         };
@@ -139,7 +121,8 @@ export class TestWebApiRequestDev extends LitElement {
 
     render() {
         return html`        
-        <div>${this.test}</div>
+        <div>${this.message}</div>
+        <div>${this.outcome}</div>
     `
     }
 
@@ -290,7 +273,7 @@ export class TestWebApiRequestDev extends LitElement {
         let output = [];
         displayType.forEach((item, i) => {
 
-            if (item.toLowerCase() == "label") {
+            if (item.toLowerCase()== "label") {
                 var data = this.filterJson(jsonData, jsonProperties[i]);
                 this.constructLabelTemplate(data, output);
             }
@@ -306,10 +289,10 @@ export class TestWebApiRequestDev extends LitElement {
         }
         )
         this.message = output;
-        // this._propagateOutcomeChanges(this.outcome);
-        this._propagateOutcomeChanges(this.test);
-    }
 
+        this._propagateOutcomeChanges(this.outcome);
+    }
+  
     constructLabelTemplate(jsonData, output) {
         var outputTemplate = "";
         var htmlTemplate = html``;
@@ -325,8 +308,7 @@ export class TestWebApiRequestDev extends LitElement {
         }
         htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
 
-        // this.outcome = outputTemplate;
-        this.test=outputTemplate;
+        this.outcome = outputTemplate;
 
         output.push(html`${htmlTemplate}`);
     }
@@ -340,7 +322,7 @@ export class TestWebApiRequestDev extends LitElement {
             if (Array.isArray(items)) {
                 var itemTemplates = [];
                 for (var i of items) {
-                    if (this.currentPageMode == 'Edit' && i == this.test) {
+                    if (this.currentPageMode == 'Edit' && i == this.outcome) {
                         itemTemplates.push(html`<option selected>${i}</option>`);
                     }
                     else {
@@ -358,7 +340,7 @@ export class TestWebApiRequestDev extends LitElement {
             }
         }
         else {
-            this.constructLabelTemplate(this.test);
+            this.constructLabelTemplate(this.outcome);
         }
     }
 
@@ -383,7 +365,7 @@ export class TestWebApiRequestDev extends LitElement {
 
         htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
 
-        this.test = rawValue;
+        this.outcome = rawValue;
         output.push(html`${htmlTemplate}`);
     }
     isInt(value) {
