@@ -14,17 +14,13 @@ export class TestPluginForOutcome extends LitElement {
       fallbackDisableSubmit: false,
       version: '1.3',  // Updated version to reflect changes
       properties: {
-        who: {
-          type: 'string',
-          title: 'Who',
-          description: 'Who to say hello to',
-        },
-        employeeInfo: {
+         employeeInfo: {
           type: 'object',
           title: 'Employee Info',
           description: 'Contains employee details like FirstName, LastName, and EmployeeID',
         }
-      }
+      },
+            events: ["ntx-value-change"],
     };
   }
 
@@ -33,9 +29,9 @@ export class TestPluginForOutcome extends LitElement {
     super();
     this.who = 'World';
     this.employeeInfo = {
-      FirstName: 'John',
-      LastName: 'Doe',
-      EmployeeID: '12345',
+      FirstName: '',
+      LastName: '',
+      EmployeeID: '',
     };
   }
 
@@ -48,12 +44,26 @@ export class TestPluginForOutcome extends LitElement {
     `;
   }
 
+  _propagateOutcomeChanges(targetValue) {
+    const args = {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+        detail: targetValue,
+    };
+    const event = new CustomEvent('ntx-value-change', args);
+    this.dispatchEvent(event);
+}
   // Method to simulate accessing form data from Nintex
   updateEmployeeInfo(newFirstName, newLastName, newEmployeeID) {
     this.employeeInfo.FirstName = newFirstName;
     this.employeeInfo.LastName = newLastName;
     this.employeeInfo.EmployeeID = newEmployeeID;
     this.requestUpdate();
+    this._propagateOutcomeChanges(this.outcome);
+  }
+  connectedCallback(){
+  this.updateEmployeeInfo("Preetha","P","2561361")
   }
 }
 
@@ -61,50 +71,3 @@ export class TestPluginForOutcome extends LitElement {
 const elementName = 'test-outcome';
 customElements.define(elementName, TestPluginForOutcome);
 
-// Assuming the Nintex Form plugin provides the form context
-function handleObjectCustomField(formContext) {
-  // Access the custom field designated as the "value field" (EmployeeInfo)
-  const employeeInfoControl = formContext.control('EmployeeInfo');
-
-  // Get the value of the EmployeeInfo field (this is an object with FirstName, LastName, EmployeeID)
-  const employeeInfo = employeeInfoControl.value; // assuming it returns an object like {FirstName, LastName, EmployeeID}
-
-  // Access fields using dot notation
-  const firstName = employeeInfo.FirstName;
-  const lastName = employeeInfo.LastName;
-  const employeeID = employeeInfo.EmployeeID;
-
-  // Output the data for further processing in the plugin
-  console.log('Employee Info:', employeeInfo);
-  console.log(`Name: ${firstName} ${lastName}`);
-  console.log('Employee ID:', employeeID);
-
-  // If you need to update the value of EmployeeInfo, you can do so like this:
-  employeeInfoControl.value.FirstName = 'Jane';
-  employeeInfoControl.value.LastName = 'Smith';
-  employeeInfoControl.value.EmployeeID = '54321';
-
-  // Trigger the plugin output, which could be sent to a workflow or other areas
-  return {
-    EmployeeInfo: employeeInfo,  // Return the entire object
-    FirstName: firstName,
-    LastName: lastName,
-    EmployeeID: employeeID
-  };
-}
-
-// Example usage of the handleObjectCustomField function within the form context
-const formContext = {
-  control: (controlName) => ({
-    value: {
-      FirstName: 'John',
-      LastName: 'Doe',
-      EmployeeID: '12345'
-    },
-    // You could also define other methods like setValue, getValue, etc. if needed.
-  })
-};
-
-// Call the function to handle the EmployeeInfo field
-const result = handleObjectCustomField(formContext);
-console.log(result);
