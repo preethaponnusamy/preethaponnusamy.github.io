@@ -266,38 +266,33 @@ export class TestWebApiRequestDev extends LitElement {
 
     }
 
-    // plugToForm(jsonData) {
-    //     var displayType = this.displayAs.split(',');
-    //     var jsonProperties = this.jsonPath.split(',');
-    //     let output = [];
+    plugToForm(jsonData) {
+        var displayType = this.displayAs.split(',');
+        var jsonProperties = this.jsonPath.split(',');
+        let output = [];
 
-    //     displayType.forEach((item, i) => {
-    //         const fieldName = `field_${i + 1}`;
-    //         if (item.toLowerCase() == "label") {
-    //             var data = this.filterJson(jsonData, jsonProperties[i]);
-    //             this.constructLabelTemplate(data, output,fieldName);
-    //         }
-    //         else if (item.toLowerCase() == "dropdown") {
-    //             var data = this.filterJson(jsonData, jsonProperties[i]);
-    //             this.constructDropdownTemplate(data, output,fieldName);
-    //         }
-    //         else if (item.toLowerCase() == "Label using Mustache Template") {
-    //             var data = this.filterJson(jsonData, jsonProperties[i]);
-    //             this.constructLabelUsingMustacheTemplate(data, output,fieldName);
-    //         }
+        displayType.forEach((item, i) => {
+            const fieldName = `field_${i + 1}`;
+            if (item.toLowerCase() == "label") {
+                var data = this.filterJson(jsonData, jsonProperties[i]);
+                this.constructLabelTemplate(data, output,fieldName);
+            }
+            else if (item.toLowerCase() == "dropdown") {
+                var data = this.filterJson(jsonData, jsonProperties[i]);
+                this.constructDropdownTemplate(data, output,fieldName);
+            }
+            else if (item.toLowerCase() == "Label using Mustache Template") {
+                var data = this.filterJson(jsonData, jsonProperties[i]);
+                this.constructLabelUsingMustacheTemplate(data, output,fieldName);
+            }
 
-    //     }
-    //     )
-    //     this.message = output;
-
-    //     // this._propagateOutcomeChanges(this.outcome);
-    // }
-plugToForm(jsonData) {
-       let element=document.getElementsByClassName("dropdown1");
-        if (element) {
-            element.value = 'New Value';  // Set the value
         }
+        )
+        this.message = output;
+
+        // this._propagateOutcomeChanges(this.outcome);
     }
+
     constructLabelTemplate(jsonData, output, fieldName) {
         var outputTemplate = "";
         var htmlTemplate = html``;
