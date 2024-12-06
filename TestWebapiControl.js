@@ -293,27 +293,10 @@ export class TestWebApiRequestDev extends LitElement {
     //     // this._propagateOutcomeChanges(this.outcome);
     // }
 plugToForm(jsonData) {
-        // Example for how to access Nintex form control values
-        var form = window.NtxForm;
-        
-        // Let's say you want to access and modify the dropdown values in Nintex form
-        var dropdown1Value = form.getControlValue('dropdown1'); // get value of dropdown1
-        var dropdown2Value = form.getControlValue('dropdown2'); // get value of dropdown2
-
-        console.log('Dropdown1 Value:', dropdown1Value);
-        console.log('Dropdown2 Value:', dropdown2Value);
-
-        // Now let's use those values to update the plugin outcome or to set them to other controls
-        // Assuming you want to update the form fields with values from the API
-
-        form.setControlValue('dropdown1', "jsonData.dropdown1");
-        form.setControlValue('dropdown2', "jsonData.dropdown2");
-
-        // If you need to trigger a rule, you can trigger an event like this:
-        form.triggerControlEvent('dropdown1', 'change');
-        form.triggerControlEvent('dropdown2', 'change');
-        
-        this._propagateOutcomeChanges({ dropdown1: jsonData.dropdown1, dropdown2: jsonData.dropdown2 });
+       let element=document.getElementsByClassName("dropdown1");
+        if (element) {
+            element.value = 'New Value';  // Set the value
+        }
     }
     constructLabelTemplate(jsonData, output, fieldName) {
         var outputTemplate = "";
