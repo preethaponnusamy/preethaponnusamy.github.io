@@ -331,7 +331,7 @@ export class TestWebApiRequestDev extends LitElement {
                     }
                 }
 
-                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
+                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value,fieldName)} >
                               ${itemTemplates}
                             </select>
                         `);
