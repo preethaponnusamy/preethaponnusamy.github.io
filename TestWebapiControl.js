@@ -125,12 +125,12 @@ export class TestWebApiRequestDev extends LitElement {
     `
     }
 
-    _propagateOutcomeChanges(targetValue) {
+    _propagateOutcomeChanges(targetValue, fieldname) {
         const args = {
             bubbles: true,
             cancelable: false,
             composed: true,
-            detail: targetValue,
+            detail: { fieldName, value: targetValue },
         };
         const event = new CustomEvent('ntx-value-change', args);
         this.dispatchEvent(event);
@@ -270,29 +270,30 @@ export class TestWebApiRequestDev extends LitElement {
         var displayType = this.displayAs.split(',');
         var jsonProperties = this.jsonPath.split(',');
         let output = [];
-        displayType.forEach((item, i) => {
 
-            if (item.toLowerCase()== "label") {
+        displayType.forEach((item, i) => {
+            const fieldName = `field_${i + 1}`;
+            if (item.toLowerCase() == "label") {
                 var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructLabelTemplate(data, output);
+                this.constructLabelTemplate(data, output,fieldName);
             }
             else if (item.toLowerCase() == "dropdown") {
                 var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructDropdownTemplate(data, output);
+                this.constructDropdownTemplate(data, output,fieldName);
             }
             else if (item.toLowerCase() == "Label using Mustache Template") {
                 var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructLabelUsingMustacheTemplate(data, output);
+                this.constructLabelUsingMustacheTemplate(data, output,fieldName);
             }
 
         }
         )
         this.message = output;
 
-        this._propagateOutcomeChanges(this.outcome);
+        // this._propagateOutcomeChanges(this.outcome);
     }
 
-    constructLabelTemplate(jsonData, output) {
+    constructLabelTemplate(jsonData, output, fieldName) {
         var outputTemplate = "";
         var htmlTemplate = html``;
 
@@ -310,9 +311,10 @@ export class TestWebApiRequestDev extends LitElement {
         this.outcome = outputTemplate;
 
         output.push(html`${htmlTemplate}`);
+        this._propagateOutcomeChanges(outputTemplate, fieldName);
     }
 
-    constructDropdownTemplate(items, output) {
+    constructDropdownTemplate(items, output,fieldName) {
         if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
             if (typeof items === 'string') {
                 items = [items];
@@ -333,17 +335,18 @@ export class TestWebApiRequestDev extends LitElement {
                               ${itemTemplates}
                             </select>
                         `);
+                        this._propagateOutcomeChanges(items[0], fieldName);  
             }
             else {
                 output.push(html`<p>WebApi response not in array. Check WebApi Configuration</p>`);
             }
         }
         else {
-            this.constructLabelTemplate(this.outcome);
+            this.constructLabelTemplate(items,output,fieldName);
         }
     }
 
-    constructLabelUsingMustacheTemplate(jsonData, output) {
+    constructLabelUsingMustacheTemplate(jsonData, output,fieldName) {
         var rawValue = "";
         var htmlTemplate = html``;
 
@@ -366,6 +369,7 @@ export class TestWebApiRequestDev extends LitElement {
 
         this.outcome = rawValue;
         output.push(html`${htmlTemplate}`);
+        this._propagateOutcomeChanges(outputTemplate, fieldName);
     }
     isInt(value) {
         return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
