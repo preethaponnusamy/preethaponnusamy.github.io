@@ -78,7 +78,7 @@ export class TestWebApiRequestDev extends LitElement {
                     isValueField: true
                 }
             },
-            events: ["ntx-value-change"]
+            events: ["ntx-value-change"],
         };
     }
 
@@ -124,28 +124,16 @@ export class TestWebApiRequestDev extends LitElement {
         <div>${this.message}</div>
     `
     }
-    _triggerDropdownChange(dropdownName, value) {
-        // const eventDetail = { [dropdownName]: value };
-        const event = new CustomEvent(`${dropdownName}-change`, {
-            bubbles: true,
-            cancelable: false,
-            composed: true,
-            detail: "500 Commerce street"
-        });
-        this.dispatchEvent(event);
-    }
-
 
     _propagateOutcomeChanges(targetValue) {
         const args = {
             bubbles: true,
             cancelable: false,
             composed: true,
-            detail: ["Preetha","USA"],
+            detail: targetValue,
         };
         const event = new CustomEvent('ntx-value-change', args);
         this.dispatchEvent(event);
-        
     }
     updated(changedProperties) {
         super.updated(changedProperties);
@@ -347,8 +335,11 @@ export class TestWebApiRequestDev extends LitElement {
                         `);
             }
             else {
-                output.push(html`<p>WebApi response not returning any data.</p>`);
+                output.push(html`<p>WebApi response not in array. Check WebApi Configuration</p>`);
             }
+        }
+        else {
+            this.constructLabelTemplate(this.outcome);
         }
     }
 
