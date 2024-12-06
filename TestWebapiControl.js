@@ -266,33 +266,55 @@ export class TestWebApiRequestDev extends LitElement {
 
     }
 
-    plugToForm(jsonData) {
-        var displayType = this.displayAs.split(',');
-        var jsonProperties = this.jsonPath.split(',');
-        let output = [];
+    // plugToForm(jsonData) {
+    //     var displayType = this.displayAs.split(',');
+    //     var jsonProperties = this.jsonPath.split(',');
+    //     let output = [];
 
-        displayType.forEach((item, i) => {
-            const fieldName = `field_${i + 1}`;
-            if (item.toLowerCase() == "label") {
-                var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructLabelTemplate(data, output,fieldName);
-            }
-            else if (item.toLowerCase() == "dropdown") {
-                var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructDropdownTemplate(data, output,fieldName);
-            }
-            else if (item.toLowerCase() == "Label using Mustache Template") {
-                var data = this.filterJson(jsonData, jsonProperties[i]);
-                this.constructLabelUsingMustacheTemplate(data, output,fieldName);
-            }
+    //     displayType.forEach((item, i) => {
+    //         const fieldName = `field_${i + 1}`;
+    //         if (item.toLowerCase() == "label") {
+    //             var data = this.filterJson(jsonData, jsonProperties[i]);
+    //             this.constructLabelTemplate(data, output,fieldName);
+    //         }
+    //         else if (item.toLowerCase() == "dropdown") {
+    //             var data = this.filterJson(jsonData, jsonProperties[i]);
+    //             this.constructDropdownTemplate(data, output,fieldName);
+    //         }
+    //         else if (item.toLowerCase() == "Label using Mustache Template") {
+    //             var data = this.filterJson(jsonData, jsonProperties[i]);
+    //             this.constructLabelUsingMustacheTemplate(data, output,fieldName);
+    //         }
 
-        }
-        )
-        this.message = output;
+    //     }
+    //     )
+    //     this.message = output;
 
-        // this._propagateOutcomeChanges(this.outcome);
+    //     // this._propagateOutcomeChanges(this.outcome);
+    // }
+plugToForm(jsonData) {
+        // Example for how to access Nintex form control values
+        var form = window.NtxForm;
+        
+        // Let's say you want to access and modify the dropdown values in Nintex form
+        var dropdown1Value = form.getControlValue('dropdown1'); // get value of dropdown1
+        var dropdown2Value = form.getControlValue('dropdown2'); // get value of dropdown2
+
+        console.log('Dropdown1 Value:', dropdown1Value);
+        console.log('Dropdown2 Value:', dropdown2Value);
+
+        // Now let's use those values to update the plugin outcome or to set them to other controls
+        // Assuming you want to update the form fields with values from the API
+
+        form.setControlValue('dropdown1', "jsonData.dropdown1");
+        form.setControlValue('dropdown2', "jsonData.dropdown2");
+
+        // If you need to trigger a rule, you can trigger an event like this:
+        form.triggerControlEvent('dropdown1', 'change');
+        form.triggerControlEvent('dropdown2', 'change');
+        
+        this._propagateOutcomeChanges({ dropdown1: jsonData.dropdown1, dropdown2: jsonData.dropdown2 });
     }
-
     constructLabelTemplate(jsonData, output, fieldName) {
         var outputTemplate = "";
         var htmlTemplate = html``;
