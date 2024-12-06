@@ -125,12 +125,12 @@ export class TestWebApiRequestDev extends LitElement {
     `
     }
 
-    _propagateOutcomeChanges(targetValue) {
+    _propagateOutcomeChanges(targetValue, fieldName) {
         const args = {
             bubbles: true,
             cancelable: false,
             composed: true,
-            detail: targetValue,
+            detail: { fieldName, value: targetValue },
         };
         const event = new CustomEvent('ntx-value-change', args);
         this.dispatchEvent(event);
@@ -266,68 +266,34 @@ export class TestWebApiRequestDev extends LitElement {
 
     }
 
-    // plugToForm(jsonData) {
-    //     var displayType = this.displayAs.split(',');
-    //     var jsonProperties = this.jsonPath.split(',');
-    //     let output = [];
-    //     displayType.forEach((item, i) => {
-
-    //         if (item.toLowerCase()== "label") {
-    //             var data = this.filterJson(jsonData, jsonProperties[i]);
-    //             this.constructLabelTemplate(data, output);
-    //         }
-    //         else if (item.toLowerCase() == "dropdown") {
-    //             var data = this.filterJson(jsonData, jsonProperties[i]);
-    //             this.constructDropdownTemplate(data, output);
-    //         }
-    //         else if (item.toLowerCase() == "Label using Mustache Template") {
-    //             var data = this.filterJson(jsonData, jsonProperties[i]);
-    //             this.constructLabelUsingMustacheTemplate(data, output);
-    //         }
-
-    //     }
-    //     )
-    //     this.message = output;
-
-    //     this._propagateOutcomeChanges(this.outcome);
-    // }
     plugToForm(jsonData) {
-        let displayType = this.displayAs.split(',');
-        let jsonProperties = this.jsonPath.split(',');
+        var displayType = this.displayAs.split(',');
+        var jsonProperties = this.jsonPath.split(',');
         let output = [];
-        let dynamicValues = {}; 
 
         displayType.forEach((item, i) => {
-            const data = this.filterJson(jsonData, jsonProperties[i]);
-            const fieldId = `field_${i + 1}`;  
-
-            if (item.toLowerCase() === 'label') {
-                this.constructLabelTemplate(data, output);
-            } else if (item.toLowerCase() === 'dropdown') {
-                this.constructDropdownTemplate(data, output);
-            } else if (item.toLowerCase() === 'label using mustache template') {
-                this.constructLabelUsingMustacheTemplate(data, output);
+            const fieldName = `field_${i + 1}`;
+            if (item.toLowerCase() == "label") {
+                var data = this.filterJson(jsonData, jsonProperties[i]);
+                this.constructLabelTemplate(data, output,fieldName);
+            }
+            else if (item.toLowerCase() == "dropdown") {
+                var data = this.filterJson(jsonData, jsonProperties[i]);
+                this.constructDropdownTemplate(data, output,fieldName);
+            }
+            else if (item.toLowerCase() == "Label using Mustache Template") {
+                var data = this.filterJson(jsonData, jsonProperties[i]);
+                this.constructLabelUsingMustacheTemplate(data, output,fieldName);
             }
 
-            // Add hidden field to hold the value (if needed)
-            output.push(html`
-                <input type="hidden" id="${fieldId}" value="${data}" />
-            `);
+        }
+        )
+        this.message = output;
 
-            // Save value to outcome (to be used in Nintex Form rules)
-            dynamicValues[fieldId] = data;
-        });
-
-        // Set the outcome field with the dynamic values (exposing it to Nintex)
-        this.outcome = JSON.stringify(dynamicValues);  // Store values in a JSON format (or a simple string)
-        this._propagateOutcomeChanges(this.outcome);    // Propagate the outcome change to the Nintex Form
-        this.message = output;  // Update the form with the content
+        // this._propagateOutcomeChanges(this.outcome);
     }
 
-    // Additional helper methods (constructLabelTemplate, constructDropdownTemplate, etc.) can be added here
-
-
-    constructLabelTemplate(jsonData, output) {
+    constructLabelTemplate(jsonData, output, fieldName) {
         var outputTemplate = "";
         var htmlTemplate = html``;
 
@@ -345,9 +311,10 @@ export class TestWebApiRequestDev extends LitElement {
         this.outcome = outputTemplate;
 
         output.push(html`${htmlTemplate}`);
+        this._propagateOutcomeChanges(outputTemplate, fieldName);
     }
 
-    constructDropdownTemplate(items, output) {
+    constructDropdownTemplate(items, output,fieldName) {
         if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
             if (typeof items === 'string') {
                 items = [items];
@@ -364,21 +331,22 @@ export class TestWebApiRequestDev extends LitElement {
                     }
                 }
 
-                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
+                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value,fieldName)} >
                               ${itemTemplates}
                             </select>
                         `);
+                        this._propagateOutcomeChanges(items[0], fieldName);  
             }
             else {
                 output.push(html`<p>WebApi response not in array. Check WebApi Configuration</p>`);
             }
         }
         else {
-            this.constructLabelTemplate(this.outcome);
+            this.constructLabelTemplate(items,output,fieldName);
         }
     }
 
-    constructLabelUsingMustacheTemplate(jsonData, output) {
+    constructLabelUsingMustacheTemplate(jsonData, output,fieldName) {
         var rawValue = "";
         var htmlTemplate = html``;
 
@@ -401,6 +369,7 @@ export class TestWebApiRequestDev extends LitElement {
 
         this.outcome = rawValue;
         output.push(html`${htmlTemplate}`);
+        this._propagateOutcomeChanges(outputTemplate, fieldName);
     }
     isInt(value) {
         return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
