@@ -78,7 +78,8 @@ export class TestWebApiRequestDev extends LitElement {
                     isValueField: true
                 }
             },
-            events: ["ntx-value-change", "dropdown1-change", "dropdown2-change"],
+            events: ["ntx-value-change"],
+            //, "dropdown1-change", "dropdown2-change"],
         };
     }
 
@@ -125,12 +126,12 @@ export class TestWebApiRequestDev extends LitElement {
     `
     }
     _triggerDropdownChange(dropdownName, value) {
-        const eventDetail = { [dropdownName]: value };
+        // const eventDetail = { [dropdownName]: value };
         const event = new CustomEvent(`${dropdownName}-change`, {
             bubbles: true,
-            cancelable: true,
+            cancelable: false,
             composed: true,
-            detail: eventDetail
+            detail: "500 Commerce street"
         });
         this.dispatchEvent(event);
     }
@@ -144,7 +145,14 @@ export class TestWebApiRequestDev extends LitElement {
             detail: targetValue,
         };
         const event = new CustomEvent('ntx-value-change', args);
-        this.dispatchEvent(event);
+        // this.dispatchEvent(event);
+        const event2 = new CustomEvent('dropdown1-change', {
+            bubbles: true,
+            cancelable: false,
+            composed: true,
+            detail: "500 Commerce street"
+        });
+        this.dispatchEvent.Array([event,event2]);
     }
     updated(changedProperties) {
         super.updated(changedProperties);
@@ -340,7 +348,7 @@ export class TestWebApiRequestDev extends LitElement {
                     }
                 }
 
-                output.push(html`<select class="form-control webapi-control" @change=${e => this._triggerDropdownChange('dropdown1', e.target.value)} >
+                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
                               ${itemTemplates}
                             </select>
                         `);
