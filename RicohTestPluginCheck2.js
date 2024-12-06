@@ -10,7 +10,7 @@ export class RicohTestBasicPluginPreetha2 extends LitElement {
     // return a promise for contract changes.
     static getMetaConfig() {
         return {
-            controlName: 'TestPlugin2',
+            controlName: 'TestPlugin1',
             fallbackDisableSubmit: false,
             version: '1.0',
             properties: {
@@ -39,5 +39,5 @@ export class RicohTestBasicPluginPreetha2 extends LitElement {
 }
 
 // registering the web component
-const elementName = 'ricoh-testplugin-preetha';
+const elementName = 'ricoh-testplugin-preetha2';
 customElements.define(elementName, RicohTestBasicPluginPreetha2);
