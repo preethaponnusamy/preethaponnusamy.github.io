@@ -125,7 +125,7 @@ export class TestWebApiRequestDev extends LitElement {
     `
     }
 
-    _propagateOutcomeChanges(targetValue, fieldname) {
+    _propagateOutcomeChanges(targetValue, fieldName) {
         const args = {
             bubbles: true,
             cancelable: false,
