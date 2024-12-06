@@ -39,5 +39,5 @@ export class RicohTestBasicPluginPreetha2 extends LitElement {
 }
 
 // registering the web component
-const elementName = 'ricoh-testplugin-preetha2';
+const elementName = 'ricoh-testplugin-preethaa';
 customElements.define(elementName, RicohTestBasicPluginPreetha2);
