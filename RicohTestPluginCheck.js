@@ -1,6 +1,8 @@
-import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
-// define the component
-export class RicohTestBasicPluginPreetha extends LitElement {
+import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
+import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
+import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"
+
+export class TestWebApiRequestJSON extends LitElement {
 
     static properties = {
         pluginLoaded: { type: Boolean },
@@ -16,12 +18,11 @@ export class RicohTestBasicPluginPreetha extends LitElement {
     }
 
     static getMetaConfig() {
-        return {            
-            controlName: 'TestPlugin1',
-            iconUrl: 'data-lookup',
-            searchTerms: ['web', 'webapi'],
+        return {
+            controlName: 'TestAPIJson',
+            description: 'Make Web Api request including OnPrem, SPO',
             fallbackDisableSubmit: false,
-            version: '1.2',
+            version: '1.0',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -222,7 +223,8 @@ export class RicohTestBasicPluginPreetha extends LitElement {
             catch (e) {
                 this.message = html`Invalid JSON response`
             }
-            this.plugToForm(jsonData);
+            // this.plugToForm(jsonData);
+            this.message=jsonData;
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -254,7 +256,8 @@ export class RicohTestBasicPluginPreetha extends LitElement {
             catch (e) {
                 this.message = html`Invalid JSON response`
             }
-            this.plugToForm(jsonData);
+            // this.plugToForm(jsonData);
+            this.message=jsonData;
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -396,6 +399,4 @@ export class RicohTestBasicPluginPreetha extends LitElement {
 
 }
 
-// registering the web component
-const elementName = 'ricoh-testplugin-preetha';
-customElements.define(elementName, RicohTestBasicPluginPreetha);
+customElements.define('test-webapi-json', TestWebApiRequestJSON);
