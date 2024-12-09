@@ -227,7 +227,7 @@ export class TestWebApiRequestJSON extends LitElement {
 
             // Propagate the JSON data to Nintex form
             this.message=jsonData;
-            this._propagateOutcomeChanges(jsonData);
+            this._propagateOutcomeChanges(JSON.parse(jsonData));
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -261,7 +261,7 @@ export class TestWebApiRequestJSON extends LitElement {
 
             this.message=jsonData;
             // Propagate the JSON data to Nintex form
-            this._propagateOutcomeChanges(jsonData);
+            this._propagateOutcomeChanges(JSON.parse(jsonData));
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
