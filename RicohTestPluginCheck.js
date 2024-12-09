@@ -1,8 +1,6 @@
-import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
-import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
-import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"
-
-export class TestWebApiRequestDev extends LitElement {
+import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
+// define the component
+export class RicohTestBasicPluginPreetha extends LitElement {
 
     static properties = {
         pluginLoaded: { type: Boolean },
@@ -18,10 +16,8 @@ export class TestWebApiRequestDev extends LitElement {
     }
 
     static getMetaConfig() {
-        return {
-            groupName: "ONC Custom (Dont use)",
-            controlName: 'TestWebApi Request Dev',
-            description: 'Make Web Api request including OnPrem, SPO',
+        return {            
+            controlName: 'TestPlugin1',
             iconUrl: 'data-lookup',
             searchTerms: ['web', 'webapi'],
             fallbackDisableSubmit: false,
@@ -258,8 +254,7 @@ export class TestWebApiRequestDev extends LitElement {
             catch (e) {
                 this.message = html`Invalid JSON response`
             }
-            // this.plugToForm(jsonData);
-            this.message=jsonData;
+            this.plugToForm(jsonData);
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -401,4 +396,6 @@ export class TestWebApiRequestDev extends LitElement {
 
 }
 
-customElements.define('test-webservice-request-dev', TestWebApiRequestDev);
+// registering the web component
+const elementName = 'ricoh-testplugin-preetha';
+customElements.define(elementName, RicohTestBasicPluginPreetha);
