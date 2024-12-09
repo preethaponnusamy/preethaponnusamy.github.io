@@ -58,7 +58,6 @@ export class TestWebApiRequestJSON extends LitElement {
                 displayAs: {
                     type: 'string',
                     title: 'Display As',
-                    // enum: ['Label', 'Dropdown', 'Label using Mustache Template'],
                     description: 'Provide display type of the control',
                     defaultValue: 'Label'
                 },
@@ -134,12 +133,14 @@ export class TestWebApiRequestJSON extends LitElement {
         const event = new CustomEvent('ntx-value-change', args);
         this.dispatchEvent(event);
     }
+
     updated(changedProperties) {
         super.updated(changedProperties);
         if (changedProperties.has('webApiUrl')) {
             this.callApi();
         }
     }
+
     connectedCallback() {
         if (this.pluginLoaded) {
             return;
@@ -186,7 +187,6 @@ export class TestWebApiRequestJSON extends LitElement {
             }
             await this.loadSPOApi(appWebUrl, spoApiUrl);
         }
-
     }
 
     async executeAsyncWithPromise(appWebUrl, requestInfo) {
@@ -220,13 +220,13 @@ export class TestWebApiRequestJSON extends LitElement {
         if (response.body != undefined && response.statusCode == 200) {
             try {
                 var jsonData = JSON.parse(response.body);
-                jsonData = this.filterJson(jsonData);
             }
             catch (e) {
                 this.message = html`Invalid JSON response`
             }
-            // this.plugToForm(jsonData);
-            this.message=jsonData;
+
+            // Propagate the JSON data to Nintex form
+            this._propagateOutcomeChanges(jsonData);
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -253,18 +253,17 @@ export class TestWebApiRequestJSON extends LitElement {
         if (response != undefined && response.status == 200) {
             try {
                 var jsonData = await response.json();
-                // jsonData = this.filterJson(jsonData);        
             }
             catch (e) {
                 this.message = html`Invalid JSON response`
             }
-            // this.plugToForm(jsonData);
-            this.message=jsonData;
+
+            // Propagate the JSON data to Nintex form
+            this._propagateOutcomeChanges(jsonData);
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
         }
-
     }
 
     plugToForm(jsonData) {
@@ -289,7 +288,6 @@ export class TestWebApiRequestJSON extends LitElement {
         }
         )
         this.message = output;
-
         this._propagateOutcomeChanges(this.outcome);
     }
   
@@ -319,86 +317,46 @@ export class TestWebApiRequestJSON extends LitElement {
                 items = [items];
             }
 
-            if (Array.isArray(items)) {
-                var itemTemplates = [];
-                for (var i of items) {
-                    if (this.currentPageMode == 'Edit' && i == this.outcome) {
-                        itemTemplates.push(html`<option selected>${i}</option>`);
-                    }
-                    else {
-                        itemTemplates.push(html`<option>${i}</option>`);
-                    }
-                }
-
-                output.push(html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
-                              ${itemTemplates}
-                            </select>
-                        `);
+            if (Array.isArray(items) && items.length > 0) {
+                output.push(html`
+                        <select class="webapi-control">
+                        ${items.map((item, i) => html`<option value="${item}" selected>${item}</option>`)}
+                        </select>
+                    `);
             }
-            else {
-                output.push(html`<p>WebApi response not in array. Check WebApi Configuration</p>`);
-            }
-        }
-        else {
-            this.constructLabelTemplate(this.outcome);
         }
     }
 
-    constructLabelUsingMustacheTemplate(jsonData, output) {
-        var rawValue = "";
-        var htmlTemplate = html``;
-
-        if (typeof jsonData === 'string' || jsonData instanceof String) {
-            rawValue = jsonData;
-        }
-        if (this.isInt(jsonData)) {
-            rawValue = jsonData.toString();
-        }
-        if (typeof jsonData == 'boolean') {
-            rawValue = (jsonData == true ? "true" : "false");
-        }
-        if (Array.isArray(jsonData)) {
-            rawValue = jsonData;
-        }
-
-        var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);
-
-        htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
-
-        this.outcome = rawValue;
-        output.push(html`${htmlTemplate}`);
-    }
-    isInt(value) {
-        return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
-    }
-
-    filterJson(jsonData, jsonProperty) {
-        if (!jsonProperty) {
-            jsonProperty = "$."
-        }
-        if (jsonData) {
-            var result = JSONPath({ path: jsonProperty, json: jsonData });
-            if (result.length == 1 && jsonProperty.endsWith(".")) {
-                result = result[0]
-            }
-            return result;
+    constructLabelUsingMustacheTemplate(items, output) {
+        if (this.mustacheTemplate) {
+            const template = this.mustacheTemplate;
+            const htmlOutput = Mustache.render(template, { items });
+            output.push(html`${unsafeHTML(htmlOutput)}`);
         }
     }
 
     isValidJSON(str) {
         try {
             JSON.parse(str);
-            return true;
         } catch (e) {
             return false;
         }
+        return true;
     }
 
-    queryParam(param) {
-        const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
-        return urlParams.get(param);
+    queryParam(name) {
+        var regex = new RegExp("[?&]" + name + "=([^&]*)", "i");
+        var match = window.location.search.match(regex);
+        return match ? match[1] : "";
     }
 
+    filterJson(jsonData, jsonPath = '$') {
+        try {
+            return JSONPath({ path: jsonPath, json: jsonData });
+        } catch (error) {
+            return "Error in filtering JSON";
+        }
+    }
 }
 
-customElements.define('test-webapi-json', TestWebApiRequestJSON);
+customElements.define('test-web-api-request-json', TestWebApiRequestJSON);
