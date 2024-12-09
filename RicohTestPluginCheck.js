@@ -359,4 +359,4 @@ export class TestWebApiRequestJSON extends LitElement {
     }
 }
 
-customElements.define('test-web-api-request-json', TestWebApiRequestJSON);
+customElements.define('test-webapi-json', TestWebApiRequestJSON);
