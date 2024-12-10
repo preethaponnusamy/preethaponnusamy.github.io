@@ -17,7 +17,7 @@ export class TestWebAPIJsonResponse extends LitElement {
     static getMetaConfig() {
         return {
             groupName: "ONC Custom (Dont use)",
-            controlName: 'TestWebApi JSON Response',
+            controlName: 'TestWebApi JSONResponse',
             description: 'Make Web Api request including OnPrem, SPO and return JSON Response',
             iconUrl: 'data-lookup',
             searchTerms: ['web', 'webapi'],
