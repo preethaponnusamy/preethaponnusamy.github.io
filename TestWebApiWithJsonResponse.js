@@ -99,7 +99,7 @@ export class TestWebAPIJsonResponse extends LitElement {
 
     render() {
         return html`        
-        <div>${this.message}</div>
+        <div>${this.message && typeof this.message === 'object' ? html`<pre>${JSON.stringify(this.message, null, 2)}</pre>` : this.message}</div>
     `
     }
 

@@ -122,8 +122,8 @@ export class TestparseApiResponse extends LitElement {
     }
     updated(changedProperties) {
         super.updated(changedProperties);
-        if (changedProperties.has('webApiUrl')) {
-            this.callApi();
+        if (changedProperties.has('jsonResponse')) {
+            this.getProperty();
         }
     }
     connectedCallback() {
@@ -137,16 +137,18 @@ export class TestparseApiResponse extends LitElement {
         if (event.target.innerText == "Edit")
             this.currentPageMode = "Edit";
         if (this.jsonResponse && this.jsonPath && this.displayAs) {
-            var jsonData = this.filterJson(JSON.parse(this.jsonResponse));
-            this.plugToForm(jsonData);
+            this.getProperty();
         }
         this.message = html`Please configure control`
-        return;          
-    
-    
+        return;
+
+
     }
 
-
+    getProperty() {
+        var jsonData = this.filterJson(JSON.parse(this.jsonResponse));
+        this.plugToForm(jsonData);
+    }
 
     plugToForm(jsonData) {
         if (this.displayAs == "Label") {
