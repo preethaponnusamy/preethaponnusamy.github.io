@@ -269,4 +269,4 @@ export class TestparseApiResponse extends LitElement {
 
 }
 
-customElements.define('test-parseApi-response', TestparseApiResponse);
+customElements.define('test-parseapi-response', TestparseApiResponse);
