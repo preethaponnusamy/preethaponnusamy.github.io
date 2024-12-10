@@ -32,7 +32,7 @@ export class TestparseApiResponse extends LitElement {
             properties: {
 
                 jsonResponse: {
-                    type: 'object',
+                    type: 'string',
                     title: 'JSON Data',
                     description: 'Provide JSON Data from api response',
                     defaultValue: [{}]
@@ -137,7 +137,7 @@ export class TestparseApiResponse extends LitElement {
         if (event.target.innerText == "Edit")
             this.currentPageMode = "Edit";
         if (this.jsonResponse && this.jsonPath && this.displayAs) {
-            var jsonData = this.filterJson(this.jsonResponse);
+            var jsonData = this.filterJson(JSON.parse(this.jsonResponse));
             this.plugToForm(jsonData);
         }
         this.message = html`Please configure control`

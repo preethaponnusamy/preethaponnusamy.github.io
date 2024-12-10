@@ -204,7 +204,7 @@ export class TestWebAPIJsonResponse extends LitElement {
                 this.message = html`Invalid JSON response`
             }
             this.message=jsonData;
-            this._propagateOutcomeChanges(jsonData);
+            this._propagateOutcomeChanges(JSON.stringify(jsonData));
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -237,7 +237,7 @@ export class TestWebAPIJsonResponse extends LitElement {
                 this.message = html`Invalid JSON response`
             }
             this.message=jsonData;
-            this._propagateOutcomeChanges(jsonData);
+            this._propagateOutcomeChanges(JSON.stringify(jsonData));
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
