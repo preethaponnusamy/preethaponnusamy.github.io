@@ -7,7 +7,7 @@ export class TestparseApiResponse extends LitElement {
     static properties = {
         pluginLoaded: { type: Boolean },
         message: { type: String },
-        jsonResponse: { type: Object },
+        jsonResponse: { type: String },
         jsonPath: { type: String },
         displayAs: { type: String },
         mustacheTemplate: { type: String },
@@ -35,7 +35,7 @@ export class TestparseApiResponse extends LitElement {
                     type: 'string',
                     title: 'JSON Data',
                     description: 'Provide JSON Data from api response',
-                    defaultValue: [{}]
+                    defaultValue: ""
                 },
                 jsonPath: {
                     type: 'string',
