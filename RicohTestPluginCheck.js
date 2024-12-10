@@ -176,8 +176,8 @@ export class TestWebApiRequestJSON extends LitElement {
             await this.loadWebApi();
         }
         else {
-            var hostWebUrl = this.queryParam("SPHostUrl");
-            var appWebUrl = this.queryParam("SPAppWebUrl");
+            var hostWebUrl = decodeURIComponent(this.queryParam("SPHostUrl"));
+            var appWebUrl = decodeURIComponent(this.queryParam("SPAppWebUrl"));
             var spoApiUrl = appWebUrl + inputWebApi.replace(hostWebUrl, "").replace("/_api/", "/_api/SP.AppContextSite(@target)/")
             if (inputWebApi.indexOf("?") == -1) {
                 spoApiUrl = spoApiUrl + "?@target='" + hostWebUrl + "'";
@@ -227,7 +227,7 @@ export class TestWebApiRequestJSON extends LitElement {
 
             // Propagate the JSON data to Nintex form
             this.message=jsonData;
-            this._propagateOutcomeChanges(JSON.stringify(jsonData));
+            this._propagateOutcomeChanges(jsonData);
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
@@ -261,7 +261,7 @@ export class TestWebApiRequestJSON extends LitElement {
 
             this.message=jsonData;
             // Propagate the JSON data to Nintex form
-            this._propagateOutcomeChanges(JSON.stringify(jsonData));
+            this._propagateOutcomeChanges(jsonData);
         }
         else {
             this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
