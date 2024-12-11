@@ -29,7 +29,7 @@ export class TestSOAPAPIJsonResponse extends LitElement {
             standardProperties: {
                 fieldLabel: true,
                 description: true,
-                visibility: true
+                visibility: false
             },
             properties: {
                 endpointUrl: {

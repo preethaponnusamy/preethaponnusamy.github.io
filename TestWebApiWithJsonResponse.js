@@ -10,7 +10,6 @@ export class TestWebAPIJsonResponse extends LitElement {
         webApiUrl: { type: String },
         headers: { type: String },
         isIntegratedAuth: { type: Boolean },
-        currentPageMode: { type: String },
         outcome: { type: String }
     }
 
@@ -27,7 +26,7 @@ export class TestWebAPIJsonResponse extends LitElement {
             standardProperties: {
                 fieldLabel: true,
                 description: true,
-                visibility: true
+                visibility: false
             },
             properties: {
                 webApiUrl: {
@@ -125,8 +124,6 @@ export class TestWebAPIJsonResponse extends LitElement {
         }
         this.pluginLoaded = true;
         super.connectedCallback();
-        var currentPageModeIndex = this.queryParam("mode");
-        this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
         if (window.location.pathname == "/") {
             this.message = html`Please configure control`
             return;
