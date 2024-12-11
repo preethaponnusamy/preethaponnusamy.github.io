@@ -12,7 +12,9 @@ export class TestparseApiResponse extends LitElement {
         displayAs: { type: String },
         mustacheTemplate: { type: String },
         currentPageMode: { type: String },
-        outcome: { type: String }
+        outcome: { type: String },
+        sortOrder: { type: String },
+        defaultMessage: { type: String }
     }
 
     static getMetaConfig() {
@@ -54,6 +56,19 @@ export class TestparseApiResponse extends LitElement {
                     type: 'string',
                     title: 'Mustache Template',
                     description: 'Provide Mustache template (applicable for selected display type)',
+                    defaultValue: ''
+                },                
+                defaultMessage: {
+                    type: 'string',
+                    title: 'Default Option for Dropdown',
+                    description: 'Please provide the default label message',
+                    defaultValue: 'Please select an option'
+                },
+                sortOrder: {
+                    type: 'string',
+                    title: 'Sort Order',
+                    description: 'Sort order of the Dropdown control.',
+                    enum: ['','asc', 'desc'],
                     defaultValue: ''
                 },
                 outcome: {
@@ -136,11 +151,16 @@ export class TestparseApiResponse extends LitElement {
         this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
         if (event.target.innerText == "Edit")
             this.currentPageMode = "Edit";
+        if(!this.jsonResponse){
+             this.message = html`Please provide valid jsonResponse`
+        }
         if (this.jsonResponse && this.jsonPath && this.displayAs) {
             this.getProperty();
         }
+        else{
         this.message = html`Please configure control`
         return;
+        }
 
 
     }
@@ -183,13 +203,21 @@ export class TestparseApiResponse extends LitElement {
     }
 
     constructDropdownTemplate(items) {
-        if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
-            if (typeof items === 'string') {
-                items = [items];
-            }
+        if (typeof items === 'string') {
+            items = [items];
+        }
 
-            if (Array.isArray(items)) {
+        if (Array.isArray(items)) {
+            if (this.sortOrder === 'asc') {
+                items.sort((a, b) => a > b ? 1 : -1);
+            } else if (this.sortOrder === 'desc') {
+                items.sort((a, b) => a < b ? 1 : -1);
+            }
+        }
+        if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
+             if (Array.isArray(items)) {
                 var itemTemplates = [];
+                itemTemplates.push(html`<option value="" disabled selected>${this.defaultMessage || 'Select an option'}</option>`);
                 for (var i of items) {
                     if (this.currentPageMode == 'Edit' && i == this.outcome) {
                         itemTemplates.push(html`<option selected>${i}</option>`);
@@ -252,15 +280,6 @@ export class TestparseApiResponse extends LitElement {
                 result = result[0]
             }
             return result;
-        }
-    }
-
-    isValidJSON(str) {
-        try {
-            JSON.parse(str);
-            return true;
-        } catch (e) {
-            return false;
         }
     }
 
