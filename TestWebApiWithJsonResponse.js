@@ -26,7 +26,7 @@ export class TestWebAPIJsonResponse extends LitElement {
             standardProperties: {
                 fieldLabel: true,
                 description: true,
-                visibility: false
+                visibility: true
             },
             properties: {
                 webApiUrl: {
