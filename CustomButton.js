@@ -79,9 +79,8 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         return html` `;
     }
 
-    handleButtonClick(event) {
-        event.preventDefault(); 
-        this.triggerFormSubmission();
+    handleButtonClick() {
+         this.triggerFormSubmission();
     }
 
     triggerFormSubmission() {
