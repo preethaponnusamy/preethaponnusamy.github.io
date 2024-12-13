@@ -103,7 +103,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         event.preventDefault();
         if (this.redirectUrl) {
             setTimeout(() => {
-                window.location.href = this.redirectUrl;
+                window.location.assign(this.redirectUrl);
             }, 500);
         } else {
             console.error("Redirect URL is not provided!");
