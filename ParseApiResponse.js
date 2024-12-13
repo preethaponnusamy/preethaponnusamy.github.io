@@ -24,7 +24,7 @@ export class TestparseApiResponse extends LitElement {
             description: 'Get the properties from JSON Data',
             iconUrl: 'data-lookup',
             fallbackDisableSubmit: false,
-            version: '1.0',
+            version: '1.1',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -43,7 +43,7 @@ export class TestparseApiResponse extends LitElement {
                     type: 'string',
                     title: 'JSON Path',
                     description: 'Provide JSON Path to filter out data',
-                    defaultValue: '$.[2].title.'
+                    defaultValue: '$.'
                 },
                 displayAs: {
                     type: 'string',
@@ -61,21 +61,22 @@ export class TestparseApiResponse extends LitElement {
                 defaultMessage: {
                     type: 'string',
                     title: 'Default Option for Dropdown',
-                    description: 'Please provide the default label message',
+                    description: 'Provide default selected text (applicable when Display As is set to Dropdown)',
                     defaultValue: 'Please select an option'
                 },
                 sortOrder: {
                     type: 'string',
                     title: 'Sort Order',
-                    description: 'Sort order of the Dropdown control.',
-                    enum: ['','asc', 'desc'],
+                    description: 'Sorting order for selected display type',
+                    enum: ['As Is','Asc', 'Desc'],
                     defaultValue: ''
                 },
                 outcome: {
                     type: 'string',
                     title: 'Outcome',
                     description: 'If set, the value will be overridden by api response',
-                    isValueField: true
+                    isValueField: true,
+                    visibility: 'hidden',
                 }
             },
             events: ["ntx-value-change"],
@@ -111,9 +112,10 @@ export class TestparseApiResponse extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
-    div[data-e2e="outcome-get"]{
-    display:none !important;
-    }
+//     div[data-e2e="outcome-get"] {
+//     display: none !important;
+// }  
+   
   `;
 
     constructor() {
@@ -211,9 +213,9 @@ export class TestparseApiResponse extends LitElement {
         }
 
         if (Array.isArray(items)) {
-            if (this.sortOrder === 'asc') {
+            if (this.sortOrder === 'Asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
-            } else if (this.sortOrder === 'desc') {
+            } else if (this.sortOrder === 'Desc') {
                 items.sort((a, b) => a < b ? 1 : -1);
             }
         }
