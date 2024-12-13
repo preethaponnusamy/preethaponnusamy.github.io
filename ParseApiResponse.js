@@ -14,7 +14,8 @@ export class TestparseApiResponse extends LitElement {
         currentPageMode: { type: String },
         outcome: { type: String },
         sortOrder: { type: String },
-        defaultMessage: { type: String }
+        defaultMessage: { type: String },
+        testStyles:{type: String}
     }
 
     static getMetaConfig() {
