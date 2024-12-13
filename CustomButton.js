@@ -88,7 +88,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         if (formElement) {
           
             formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
-            const submitButton = formElement.querySelector('.psubmit');
+            const submitButton = formElement.querySelector('.psubmit button[type="button"]');
             if (submitButton) {
                 submitButton.click(); 
             } else {
