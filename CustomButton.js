@@ -4,14 +4,14 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     static properties = {
         pluginLoaded: { type: Boolean },
         redirectUrl: { type: String },
-        submitButtonClass: { type: String } 
+        buttonLabel: { type: String },
     };
 
     static getMetaConfig() {
         return {
             groupName: "ONC Custom (Dont use)",
             controlName: 'Custom Button Dev',
-            description: 'Redirects after form submission using an existing submit button by class name.',
+            description: 'A button that redirects to a URL after form submission.',
             iconUrl: 'data-lookup',
             searchTerms: ['button', 'redirect', 'custom'],
             fallbackDisableSubmit: false,
@@ -30,12 +30,12 @@ export class CustomButtonRedirectPluginDev extends LitElement {
                     required: true,
                     defaultValue: ''
                 },
-                submitButtonClass: {
+                buttonLabel: {
                     type: 'string',
-                    title: 'Submit Button Class',
-                    description: 'Class name of the submit button to attach redirection.',
+                    title: 'Button Label',
+                    description: 'Label to display on the button',
                     required: true,
-                    defaultValue: 'submit-button' 
+                    defaultValue: 'Submit & Go to Website'
                 }
             },
             events: ["ntx-value-change"]
@@ -43,21 +43,32 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     static styles = css`
-        /* No custom button styling */
+        /* Custom styles (not exposed, as you mentioned no button) */
     `;
 
     constructor() {
         super();
         this.pluginLoaded = false;
-        this.redirectUrl = '';
-        this.submitButtonClass = 'submit-button'; 
+        this.redirectUrl = ''; 
+        this.buttonLabel = 'CustomSubmit';
     }
 
-    render() {
-        return html``;  
+    connectedCallback() {
+        super.connectedCallback();
+        if (!this.pluginLoaded) {
+            this.pluginLoaded = true;
+
+           
+            const formElement = document.querySelector('form');
+            if (formElement) {
+                formElement.addEventListener('submit', this.handleFormSubmit.bind(this));
+            } else {
+                console.error("Form not found!");
+            }
+        }
     }
 
-    handleSubmit(event) {
+    handleFormSubmit(event) {
         event.preventDefault(); 
         if (this.redirectUrl) {
             setTimeout(() => {
@@ -68,26 +79,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         }
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        if (!this.pluginLoaded) {
-            this.pluginLoaded = true;
-        }
-
-       const formElement = document.querySelector('form');
-        if (formElement) {
-            const submitButton = formElement.querySelector(`button.${this.submitButtonClass}`);
-            if (submitButton) {
-                submitButton.addEventListener('click', (event) => {
-                   this.handleSubmit(event); 
-                });
-            } else {
-                console.log(`Submit button with class '${this.submitButtonClass}' not found!`);
-            }
-        } else {
-            console.log("Form not found!");
-        }
-    }
+ 
 }
-
 customElements.define('custom-button-redirectdev', CustomButtonRedirectPluginDev);
