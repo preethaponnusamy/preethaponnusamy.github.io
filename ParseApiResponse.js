@@ -111,8 +111,8 @@ export class TestparseApiResponse extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
-   .nx-config-panel-section .nx-variable-picker-control div[data-e2e="outcome-get"] {
-  display: none;
+   [dir] ntx-form-builder-config-panel .nx-config-panel-section ntx-config-panel div[data-e2e="outcome-get"] {
+display:none;
 }
   `;
 
