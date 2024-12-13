@@ -23,6 +23,7 @@ export class ONCParseJSONDev extends LitElement {
             controlName: 'Parse JSON Dev',
             description: 'Get the properties from JSON Data',
             iconUrl: 'data-lookup',
+            searchTerms : ['parse', 'json'],
             fallbackDisableSubmit: false,
             version: '2.0',
             pluginAuthor: 'Preetha Ponnusamy',
