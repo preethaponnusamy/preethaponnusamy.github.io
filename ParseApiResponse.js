@@ -111,6 +111,9 @@ export class TestparseApiResponse extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
+    div[data-e2e="outcome-get"]{
+    display:none;
+    }
   `;
 
     constructor() {
