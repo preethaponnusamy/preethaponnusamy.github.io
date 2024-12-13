@@ -57,7 +57,7 @@ export class TestparseApiResponse extends LitElement {
                     title: 'Mustache Template',
                     description: 'Provide Mustache template (applicable for selected display type)',
                     defaultValue: ''
-                },                
+                },
                 defaultMessage: {
                     type: 'string',
                     title: 'Default Option for Dropdown',
@@ -68,7 +68,7 @@ export class TestparseApiResponse extends LitElement {
                     type: 'string',
                     title: 'Sort Order',
                     description: 'Sorting order for selected display type',
-                    enum: ['As Is','Asc', 'Desc'],
+                    enum: ['As Is', 'Asc', 'Desc'],
                     defaultValue: ''
                 },
                 outcome: {
@@ -111,10 +111,9 @@ export class TestparseApiResponse extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
-    div[data-e2e="outcome-get"] {
-    display: none !important;
-}  
-   
+   .nx-config-panel-section .nx-variable-picker-control div[data-e2e="outcome-get"] {
+  display: none;
+}
   `;
 
     constructor() {
@@ -155,15 +154,15 @@ export class TestparseApiResponse extends LitElement {
         this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
         if (event.target.innerText == "Edit")
             this.currentPageMode = "Edit";
-        if(!this.jsonResponse){
-             this.message = html`Please provide valid jsonResponse`
+        if (!this.jsonResponse) {
+            this.message = html`Please provide valid jsonResponse`
         }
         if (this.jsonResponse && this.jsonPath && this.displayAs) {
             this.getProperty();
         }
-        else{
-        this.message = html`Please configure control`
-        return;
+        else {
+            this.message = html`Please configure control`
+            return;
         }
 
 
@@ -219,7 +218,7 @@ export class TestparseApiResponse extends LitElement {
             }
         }
         if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
-             if (Array.isArray(items)) {
+            if (Array.isArray(items)) {
                 var itemTemplates = [];
                 itemTemplates.push(html`<option value="" disabled selected>${this.defaultMessage || 'Select an option'}</option>`);
                 for (var i of items) {
