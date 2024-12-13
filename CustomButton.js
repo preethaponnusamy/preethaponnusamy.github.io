@@ -15,7 +15,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
             iconUrl: 'data-lookup',
             searchTerms: ['button', 'redirect', 'custom'],
             fallbackDisableSubmit: false,
-            version: '1.0',
+            version: '1.1',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -89,7 +89,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     triggerFormSubmission() {
-        const formElement = document.querySelector('nx-form');
+        const formElement = document.querySelector('form');
         if (formElement) {
             formElement.submit();
             this.listenForFormSubmitSuccess();
@@ -99,7 +99,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     listenForFormSubmitSuccess() {
-        const formElement = document.querySelector('nx-form');
+        const formElement = document.querySelector('form');
         formElement.addEventListener('submit', this.redirectAfterSubmit.bind(this));
     }
 
