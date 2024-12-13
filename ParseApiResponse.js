@@ -112,7 +112,7 @@ export class TestparseApiResponse extends LitElement {
       color: #000;
     }
     div[data-e2e="outcome-get"]{
-    display:none;
+    display:none !important;
     }
   `;
 
