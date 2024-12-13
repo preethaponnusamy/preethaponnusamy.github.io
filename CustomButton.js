@@ -67,43 +67,38 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         super();
         this.pluginLoaded = false;
         this.redirectUrl = '';
-        this.buttonLabel = 'CustomSubmit';
+        this.buttonLabel = 'Submit & Go to Website';
     }
 
     render() {
         return html`
-            <button class="form-control redirect-button" @click="${this.handleButtonClick}">
+            <button type="submit" class="form-control redirect-button" @click="${this.handleButtonClick}">
                 ${this.buttonLabel}
             </button>
         `;
     }
 
     handleButtonClick(event) {
-        event.preventDefault(); 
+        event.preventDefault();
         this.triggerFormSubmission();
     }
 
     triggerFormSubmission() {
         const formElement = document.querySelector('form');
         if (formElement) {
-          
             formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
-            const submitButton = formElement.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.click(); 
-            } else {
-                console.error("Submit button not found!");
-            }
+            formElement.submit();
         } else {
             console.error("Form not found!");
         }
     }
 
     handleSubmit(event) {
-        event.preventDefault();
-        if (this.redirectUrl) {setTimeout(() => {
-                window.location.href = this.redirectUrl;
-            }, 100); 
+        event.preventDefault(); 
+        if (this.redirectUrl) {
+            setTimeout(() => {
+                window.location.href = this.redirectUrl; 
+            }, 100);
         } else {
             console.error("Redirect URL is not provided!");
         }
@@ -115,8 +110,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
             this.pluginLoaded = true;
         }
     }
-
-    
 }
 
 customElements.define('custom-button-redirectdev', CustomButtonRedirectPluginDev);
