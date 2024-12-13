@@ -14,8 +14,7 @@ export class TestparseApiResponse extends LitElement {
         currentPageMode: { type: String },
         outcome: { type: String },
         sortOrder: { type: String },
-        defaultMessage: { type: String },
-        testStyles:{type: String}
+        defaultMessage: { type: String }
     }
 
     static getMetaConfig() {
@@ -81,11 +80,6 @@ export class TestparseApiResponse extends LitElement {
                         visibility: false
                     },
                     
-                },
-                testStyles:{
-                    type: 'string',
-                    title: 'teststyles',
-                    default:'[dir] ntx-form-builder-config-panel .nx-config-panel-section ntx-config-panel div[data-e2e="outcome-get"] { display:none !important;}'
                 }
             },
             events: ["ntx-value-change"],
@@ -121,8 +115,7 @@ export class TestparseApiResponse extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
-     ${this.testStyles}
-
+    
   `;
 
     constructor() {
