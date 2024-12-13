@@ -72,9 +72,9 @@ export class CustomButtonRedirectPluginDev extends LitElement {
 
     render() {
         return html`
-            <button type="submit" class="form-control redirect-button" @click="${this.handleButtonClick}">
+            <input type="submit" class="form-control redirect-button" @click="${this.handleButtonClick}">
                 ${this.buttonLabel}
-            </button>
+            </input>
         `;
     }
 
