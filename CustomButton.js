@@ -4,14 +4,14 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     static properties = {
         pluginLoaded: { type: Boolean },
         redirectUrl: { type: String },
-        buttonLabel: { type: String }
+        submitButtonClass: { type: String } 
     };
 
     static getMetaConfig() {
         return {
             groupName: "ONC Custom (Dont use)",
             controlName: 'Custom Button Dev',
-            description: 'A button that redirects to a URL after form submission.',
+            description: 'Redirects after form submission using an existing submit button by class name.',
             iconUrl: 'data-lookup',
             searchTerms: ['button', 'redirect', 'custom'],
             fallbackDisableSubmit: false,
@@ -30,12 +30,12 @@ export class CustomButtonRedirectPluginDev extends LitElement {
                     required: true,
                     defaultValue: ''
                 },
-                buttonLabel: {
+                submitButtonClass: {
                     type: 'string',
-                    title: 'Button Label',
-                    description: 'Label to display on the button',
+                    title: 'Submit Button Class',
+                    description: 'Class name of the submit button to attach redirection.',
                     required: true,
-                    defaultValue: 'Submit & Go to Website'
+                    defaultValue: 'submit-button' 
                 }
             },
             events: ["ntx-value-change"]
@@ -43,54 +43,18 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     static styles = css`
-        button.redirect-button {
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            button.redirect-button {
-                font-size: 14px;
-                padding: 8px 16px;
-            }
-        }
+        /* No custom button styling */
     `;
 
     constructor() {
         super();
         this.pluginLoaded = false;
         this.redirectUrl = '';
-        this.buttonLabel = 'Submit & Go to Website';
+        this.submitButtonClass = 'submit-button'; 
     }
 
     render() {
-        return html`
-            <input type="submit" class="form-control redirect-button" @click="${this.handleButtonClick}">
-                ${this.buttonLabel}
-            </input>
-        `;
-    }
-
-    handleButtonClick(event) {
-        event.preventDefault();
-        this.triggerFormSubmission();
-    }
-
-    triggerFormSubmission() {
-        const formElement = document.querySelector('form');
-        if (formElement) {
-            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
-            formElement.submit();
-        } else {
-            console.error("Form not found!");
-        }
+        return html``;  
     }
 
     handleSubmit(event) {
@@ -98,7 +62,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         if (this.redirectUrl) {
             setTimeout(() => {
                 window.location.href = this.redirectUrl; 
-            }, 100);
+            }, 100); 
         } else {
             console.error("Redirect URL is not provided!");
         }
@@ -108,6 +72,22 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         super.connectedCallback();
         if (!this.pluginLoaded) {
             this.pluginLoaded = true;
+        }
+
+       const formElement = document.querySelector('form');
+        if (formElement) {
+            const submitButton = formElement.querySelector(`button.${this.submitButtonClass}`);
+            if (submitButton) {
+                submitButton.addEventListener('click', (event) => {
+                    event.preventDefault(); 
+                    formElement.submit(); 
+                    this.handleSubmit(event); 
+                });
+            } else {
+                console.error(`Submit button with class '${this.submitButtonClass}' not found!`);
+            }
+        } else {
+            console.error("Form not found!");
         }
     }
 }
