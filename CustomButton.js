@@ -4,7 +4,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     static properties = {
         pluginLoaded: { type: Boolean },
         redirectUrl: { type: String },
-        buttonLabel: { type: String },
+        buttonLabel: { type: String }
     };
 
     static getMetaConfig() {
@@ -43,42 +43,94 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     static styles = css`
-        /* Custom styles (not exposed, as you mentioned no button) */
+        button.redirect-button {
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            button.redirect-button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
     `;
 
     constructor() {
         super();
         this.pluginLoaded = false;
-        this.redirectUrl = ''; 
+        this.redirectUrl = '';
         this.buttonLabel = 'CustomSubmit';
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        if (!this.pluginLoaded) {
-            this.pluginLoaded = true;
+    render() {
+        // return html`
+        //     <button class="form-control redirect-button" @click="${this.handleButtonClick}">
+        //         ${this.buttonLabel}
+        //     </button>
+        // `;
+        return html` `;
+    }
 
-           
-            const formElement = document.querySelector('form');
-            if (formElement) {
-                formElement.addEventListener('submit', this.handleFormSubmit.bind(this));
+    handleButtonClick(event) {
+        event.preventDefault(); 
+        this.triggerFormSubmission();
+    }
+
+    triggerFormSubmission() {
+        const formElement = document.querySelector('form');
+        if (formElement) {
+          
+            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
+            const submitButton = formElement.querySelector('.psubmit');
+            if (submitButton) {
+                submitButton.click(); 
             } else {
-                console.error("Form not found!");
+                console.error("Submit button not found!");
             }
+        } else {
+            console.error("Form not found!");
         }
     }
 
-    handleFormSubmit(event) {
-        event.preventDefault(); 
-        if (this.redirectUrl) {
-            setTimeout(() => {
-                window.location.href = this.redirectUrl; 
+    handleSubmit(event) {
+        event.preventDefault();
+        if (this.redirectUrl) {setTimeout(() => {
+                window.location.href = this.redirectUrl;
             }, 100); 
         } else {
             console.error("Redirect URL is not provided!");
         }
     }
 
- 
+    connectedCallback() {
+        super.connectedCallback();
+        if (!this.pluginLoaded) {
+            this.pluginLoaded = true;
+        }
+        const formElement = document.querySelector('form');
+        if (formElement) {
+          
+            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
+           
+        } else {
+            console.error("Form not found!");
+        }
+    }
+    updated(changedProperties){
+        if (changedProperties.has('redirectUrl')) {
+            this.handleButtonClick();
+        }
+    }
+
+    
 }
+
 customElements.define('custom-button-redirectdev', CustomButtonRedirectPluginDev);
