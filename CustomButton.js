@@ -71,16 +71,16 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     render() {
-        // return html`
-        //     <button class="form-control redirect-button" @click="${this.handleButtonClick}">
-        //         ${this.buttonLabel}
-        //     </button>
-        // `;
-        return html` `;
+        return html`
+            <button class="form-control redirect-button" @click="${this.handleButtonClick}">
+                ${this.buttonLabel}
+            </button>
+        `;
     }
 
-    handleButtonClick() {
-         this.triggerFormSubmission();
+    handleButtonClick(event) {
+        event.preventDefault(); 
+        this.triggerFormSubmission();
     }
 
     triggerFormSubmission() {
@@ -88,7 +88,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         if (formElement) {
           
             formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
-            const submitButton = formElement.querySelector('.psubmit button[type="button"]');
+            const submitButton = formElement.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.click(); 
             } else {
@@ -113,19 +113,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         super.connectedCallback();
         if (!this.pluginLoaded) {
             this.pluginLoaded = true;
-        }
-        const formElement = document.querySelector('form');
-        if (formElement) {
-          
-            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
-           
-        } else {
-            console.error("Form not found!");
-        }
-    }
-    updated(changedProperties){
-        if (changedProperties.has('redirectUrl')) {
-            this.handleButtonClick();
         }
     }
 
