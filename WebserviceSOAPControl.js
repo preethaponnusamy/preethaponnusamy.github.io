@@ -1,6 +1,4 @@
 import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
-import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
-import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js";
 export class ONCWebServiceRequestSOAPDev extends LitElement {
 
     static properties = {
@@ -10,26 +8,23 @@ export class ONCWebServiceRequestSOAPDev extends LitElement {
         soapEnvelope: { type: String },
         soapAction: { type: String },
         headers: { type: String },
+        returnAs:{type: String},
         isIntegratedAuth: { type: Boolean },
-        jsonPath: { type: String },
-        displayAs: { type: String },
-        mustacheTemplate: { type: String },
         currentPageMode: { type: String },
         outcome: { type: String },
-        response: { type: String },
-        sortOrder: { type: String },
-        defaultMessage: { type: String }
+        response: { type: String },     
     };
+
 
     static getMetaConfig() {
         return {
             groupName: "ONC Custom (Dont use)",
             controlName: 'WebService SOAP Dev',
-            description: 'Make Web service request SOAP',
+            description: 'Make Web service request SOAP and return JSON Response',
             iconUrl: 'data-lookup',
             searchTerms: ['soap', 'webservice'],
             fallbackDisableSubmit: false,
-            version: '1.0',
+            version: '2.0',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -61,39 +56,14 @@ export class ONCWebServiceRequestSOAPDev extends LitElement {
                     title: 'Request header',
                     description: 'Provide headers',
                     defaultValue: 'Content-Type: "text/xml"; charset="utf-8"'
-                },
-                jsonPath: {
+                }, 
+                returnAs: {
                     type: 'string',
-                    title: 'JSON Path',
-                    description: 'Provide JSON Path to filter out data',
-                    defaultValue: '$.[2].title.'
-                },
-                displayAs: {
-                    type: 'string',
-                    title: 'Display As',
-                    enum: ['Label', 'Dropdown', 'Label using Mustache Template'],
-                    description: 'Provide display type of the control',
-                    defaultValue: 'Label'
-                },
-                defaultMessage: {
-                    type: 'string',
-                    title: 'Default Option for Dropdown',
-                    description: 'Please provide the default label message',
-                    defaultValue: 'Please select an option'
-                },
-                sortOrder: {
-                    type: 'string',
-                    title: 'Sort Order',
-                    description: 'Sort order of the Dropdown control.',
-                    enum: ['','asc', 'desc'],
-                    defaultValue: ''
-                },
-                mustacheTemplate: {
-                    type: 'string',
-                    title: 'Mustache Template',
-                    description: 'Provide Mustache template (applicable for selected display type)',
-                    defaultValue: ''
-                },
+                    title: 'Return output as',
+                    description: 'Provide return output type',
+                    enum: ['JSON', 'XML'],
+                    defaultValue: 'JSON'
+                },              
                 outcome: {
                     type: 'string',
                     title: 'Outcome',
@@ -135,266 +105,160 @@ export class ONCWebServiceRequestSOAPDev extends LitElement {
     }
   `;
 
-    constructor() {
-        super();
-        this.message = 'Loading...';
-        this.response = '';
-        this.jsonData = null;
+  constructor() {
+    super();
+    this.message = 'Loading...';
+    this.response = '';
+    this.jsonData = null;
+}
+_propagateOutcomeChanges(targetValue) {
+    const args = {
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+        detail: targetValue,
+    };
+    const event = new CustomEvent('ntx-value-change', args);
+    this.dispatchEvent(event);
+}
+connectedCallback() {
+    if (this.pluginLoaded) {
+        return;
     }
-    _propagateOutcomeChanges(targetValue) {
-        const args = {
-            bubbles: true,
-            cancelable: false,
-            composed: true,
-            detail: targetValue,
-        };
-        const event = new CustomEvent('ntx-value-change', args);
-        this.dispatchEvent(event);
+    this.pluginLoaded = true;
+    var currentPageModeIndex = this.queryParam("mode");
+    this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
+    super.connectedCallback();
+    if (!this.soapEnvelope) {
+        this.message = "SOAP Envelope is required.";
+        return;
     }
-    connectedCallback() {
-        if (this.pluginLoaded) {
-            return;
-        }
-        this.pluginLoaded = true;
-        var currentPageModeIndex = this.queryParam("mode");
-        this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
-        super.connectedCallback();
-        if (!this.soapEnvelope) {
-            this.message = "SOAP Envelope is required.";
-            return;
-        }
-        if (!this.soapAction) {
-            this.message = "SOAP Action is required.";
-            return;
-        }
-        if (!this.endpointUrl) {
-            this.message = "SOAP Endpoint is required.";
-            return;
-        }
-        else {
-            console.log("Calling SOAP endpoint - start");
-            this.makeSoapRequest();
-            console.log("Calling SOAP endpoint - end");
-        }
+    if (!this.soapAction) {
+        this.message = "SOAP Action is required.";
+        return;
     }
+    if (!this.endpointUrl) {
+        this.message = "SOAP Endpoint is required.";
+        return;
+    }
+    else {
+        console.log("Calling SOAP endpoint - start");
+        this.makeSoapRequest();
+        console.log("Calling SOAP endpoint - end");
+    }
+}
 
-    
-    // Send SOAP request when the component is first updated 
-    updated(changedProperties) {
-        super.updated(changedProperties);
-        if (!changedProperties.has('response')) {
-            this.makeSoapRequest();
-        }
+
+// Send SOAP request when the component is first updated 
+updated(changedProperties) {
+    super.updated(changedProperties);
+    if (!changedProperties.has('response')) {
+        this.makeSoapRequest();
     }
+}
 
-    async makeSoapRequest() {
-        const soapEnvelopeData = this.soapEnvelope;
-        try {
-            const response = await fetch(this.endpointUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'text/xml; charset="utf-8"',
-                    'SOAPAction': this.soapAction,
-                },
-                body: soapEnvelopeData,
-            });
+async makeSoapRequest() {
+    const soapEnvelopeData = this.soapEnvelope;
+    try {
+        const response = await fetch(this.endpointUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/xml; charset="utf-8"',
+                'SOAPAction': this.soapAction,
+            },
+            body: soapEnvelopeData,
+        });
 
-            if (response.ok) {
-                const xml = await response.text();
-                this.response = xml;
-                var jsonData = this.parseXmlToJson(xml);
-                jsonData = this.filterJson(jsonData);
-                console.log(jsonData);
-                this.plugToForm(jsonData);
+        if (response.ok) {
+            const xml = await response.text();
+            this.response = xml;
+            if(this.returnAs === "JSON")
+            {
+            var jsonData = this.parseXmlToJson(xml);
+            this.message=jsonData;
+            this._propagateOutcomeChanges(JSON.stringify(jsonData));
+            }
+            else{
+                this.message=this.response;
+                this._propagateOutcomeChanges(this.response);
+            }
+            
+        } else {
+            this.response = 'Error: ' + response.statusText;
+        }
+    } catch (error) {
+        this.response = 'Error: ' + error.message;
+    }
+}
+xmlToJson(xml) {
+    const obj = {};
+
+    if (xml.nodeType === 1) {
+        if (xml.attributes.length > 0) {
+            obj["@attributes"] = {};
+            for (let i = 0; i < xml.attributes.length; i++) {
+
+                const attribute = xml.attributes.item(i);
+
+                obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+
+            }
+
+        }
+
+    } else if (xml.nodeType === 3) {
+
+        obj["#text"] = xml.nodeValue.trim();
+
+    }
+    if (xml.hasChildNodes()) {
+
+        for (let i = 0; i < xml.childNodes.length; i++) {
+
+            const child = xml.childNodes.item(i);
+
+            const nodeName = child.nodeName;
+
+            if (!obj[nodeName]) {
+
+                obj[nodeName] = this.xmlToJson(child);
+
             } else {
-                this.response = 'Error: ' + response.statusText;
-            }
-        } catch (error) {
-            this.response = 'Error: ' + error.message;
-        }
-    }
-    xmlToJson(xml) {
-        const obj = {};
 
-        if (xml.nodeType === 1) {
-            if (xml.attributes.length > 0) {
-                obj["@attributes"] = {};
-                for (let i = 0; i < xml.attributes.length; i++) {
+                if (!Array.isArray(obj[nodeName])) {
 
-                    const attribute = xml.attributes.item(i);
-
-                    obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+                    obj[nodeName] = [obj[nodeName]];
 
                 }
 
-            }
-
-        } else if (xml.nodeType === 3) {
-
-            obj["#text"] = xml.nodeValue.trim();
-
-        }
-        if (xml.hasChildNodes()) {
-
-            for (let i = 0; i < xml.childNodes.length; i++) {
-
-                const child = xml.childNodes.item(i);
-
-                const nodeName = child.nodeName;
-
-                if (!obj[nodeName]) {
-
-                    obj[nodeName] = this.xmlToJson(child);
-
-                } else {
-
-                    if (!Array.isArray(obj[nodeName])) {
-
-                        obj[nodeName] = [obj[nodeName]];
-
-                    }
-
-                    obj[nodeName].push(this.xmlToJson(child));
-
-                }
+                obj[nodeName].push(this.xmlToJson(child));
 
             }
 
         }
 
-        return obj;
-
-    }
-    parseXmlToJson(xmlResponse) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
-        this.jsonData = this.xmlToJson(xmlDoc);
-        return this.jsonData;
-    }
-    filterJson(jsonData) {
-        if (!this.jsonPath) {
-            this.jsonPath = "$."
-        }
-        if (jsonData) {
-            var result = JSONPath({ path: this.jsonPath, json: jsonData });
-            if (result.length == 1 && this.jsonPath.endsWith(".")) {
-                result = result[0]
-            }
-            return result;
-        }
-    }
-    plugToForm(jsonData) {
-        if (this.displayAs == "Label") {
-            this.constructLabelTemplate(jsonData)
-        }
-        else if (this.displayAs == "Dropdown") {
-            this.constructDropdownTemplate(jsonData)
-        }
-        else if (this.displayAs == "Label using Mustache Template") {
-            this.constructLabelUsingMustacheTemplate(jsonData)
-        }
-        this._propagateOutcomeChanges(this.outcome);
     }
 
-    constructLabelTemplate(jsonData) {
-        var outputTemplate = "";
-        var htmlTemplate = html``;
+    return obj;
 
-        if (typeof jsonData === 'string' || jsonData instanceof String) {
-            outputTemplate = jsonData;
-        }
-        if (typeof jsonData == 'object'){
-            outputTemplate = jsonData.toString();
-        }
-        if (this.isInt(jsonData)) {
-            outputTemplate = jsonData.toString();
-        }
-        if (typeof jsonData == 'boolean') {
-            outputTemplate = (jsonData == true ? "true" : "false");
-        }
-        htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
+}
+parseXmlToJson(xmlResponse) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlResponse, 'text/xml');
+    this.jsonData = this.xmlToJson(xmlDoc);
+    return this.jsonData;
+}
 
-        this.outcome = outputTemplate;
-        this.message = html`${htmlTemplate}`
-    }
+queryParam(param) {
+    const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
+    return urlParams.get(param);
+}
 
-    constructDropdownTemplate(items) {
-        if (typeof items === 'string') {
-            items = [items];
-        }
-
-        if (Array.isArray(items)) {
-            if (this.sortOrder === 'asc') {
-                items.sort((a, b) => a > b ? 1 : -1);
-            } else if (this.sortOrder === 'desc') {
-                items.sort((a, b) => a < b ? 1 : -1);
-            }
-        }
-        if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
-            if (Array.isArray(items)) {
-                var itemTemplates = [];
-                itemTemplates.push(html`<option value="" disabled selected>${this.defaultMessage || 'Select an option'}</option>`);
-                for (var i of items) {
-                    if (this.currentPageMode == 'Edit' && i == this.outcome) {
-                        itemTemplates.push(html`<option selected>${i}</option>`);
-                    }
-                    else {
-                        itemTemplates.push(html`<option>${i}</option>`);
-                    }
-                }
-
-                this.message = html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
-                              ${itemTemplates}
-                            </select>
-                        `
-            }
-            else {
-                this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
-            }
-        }
-        else {
-            this.constructLabelTemplate(this.outcome);
-        }
-    }
-
-    constructLabelUsingMustacheTemplate(jsonData) {
-        var rawValue = "";
-        var htmlTemplate = html``;
-
-        if (typeof jsonData === 'string' || jsonData instanceof String) {
-            rawValue = jsonData;
-        }
-        if (this.isInt(jsonData)) {
-            rawValue = jsonData.toString();
-        }
-        if (typeof jsonData == 'boolean') {
-            rawValue = (jsonData == true ? "true" : "false");
-        }
-        if (Array.isArray(jsonData)) {
-            rawValue = jsonData;
-        }
-
-        var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);
-
-        htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
-
-        this.outcome = rawValue;
-        this.message = html`${htmlTemplate}`
-    }
-
-    isInt(value) {
-        return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
-    }
-    queryParam(param) {
-        const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
-        return urlParams.get(param);
-    }
-
-    render() {
-        return html`        
-        <div>${this.message}</div>
-    `
-    }
+render() {
+    return html`        
+    <div>${this.message && typeof this.message === 'object' ? html`<pre>${JSON.stringify(this.message, null, 2)}</pre>` : this.message}</div>
+`
+}
 }
 const elementName = 'onc-webservice-soap-request-dev';
 customElements.define(elementName, ONCWebServiceRequestSOAPDev);

@@ -1,44 +1,38 @@
 import {LitElement, css, html, unsafeHTML} from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
-import {JSONPath} from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
-import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"
 
 export class OncWebApiRequestDev extends LitElement {
     
-  static properties = {  
-    pluginLoaded : {type: Boolean},  
-    message : {type: String},
-    webApiUrl: {type: String},
-    headers: {type: String},
-    isIntegratedAuth: {type: Boolean},
-    jsonPath: {type: String},
-    displayAs: {type: String},
-    mustacheTemplate: {type: String},
-    currentPageMode: {type: String},
-    outcome: {type: String}
-  }   
+  static properties = {
+    pluginLoaded: { type: Boolean },
+    message: { type: String },
+    webApiUrl: { type: String },
+    headers: { type: String },
+    isIntegratedAuth: { type: Boolean },
+    outcome: { type: String }
+} 
       
   static getMetaConfig() {    
     return {
       groupName : "ONC Custom (Dont use)",
       controlName: 'WebApi Request Dev',
-      description : 'Make Web Api request including OnPrem, SPO',
+      description : 'Make Web Api request including OnPrem, SPO and return JSON Response',
       iconUrl : 'data-lookup',
       searchTerms : ['web', 'webapi'],
       fallbackDisableSubmit: false,
-      version: '1.2',
+      version: '2.0',
       pluginAuthor : 'Preetha Ponnusamy',
       standardProperties: {
         fieldLabel:true,
         description:true,
         visibility: true        
       },
-      properties: {        
+      properties: {
         webApiUrl: {
-          type: 'string',
-          title: 'WebApi Url',
-          description: 'Provide Web api Url',
-          required : true,
-          defaultValue : 'https://jsonplaceholder.typicode.com/todos'
+            type: 'string',
+            title: 'WebApi Url',
+            description: 'Provide Web api Url',
+            required: true,
+            defaultValue: 'https://jsonplaceholder.typicode.com/todos'
         },
         headers: {
             type: 'string',
@@ -47,37 +41,18 @@ export class OncWebApiRequestDev extends LitElement {
             defaultValue: '{ "Accept" : "application/json" }'
         },
         isIntegratedAuth: {
-          type: 'boolean',
-          title: 'Is Integrated Authentication',
-          description: 'Check yes for Windows Integrated Auth',
-          defaultValue: false
+            type: 'boolean',
+            title: 'Is Integrated Authentication',
+            description: 'Check yes for Windows Integrated Auth',
+            defaultValue: false
         },
-        jsonPath: {
-            type: 'string',
-            title: 'JSON Path',
-            description: 'Provide JSON Path to filter out data',
-            defaultValue: '$.[2].title.'
-        },
-        displayAs: {
-            type: 'string',
-            title: 'Display As',
-            enum: ['Label', 'Dropdown', 'Label using Mustache Template'],
-            description: 'Provide display type of the control',
-            defaultValue: 'Label'
-        },
-        mustacheTemplate: {
-          type: 'string',
-          title: 'Mustache Template',          
-          description: 'Provide Mustache template (applicable for selected display type)',
-          defaultValue: ''
-      },
         outcome: {
-          type: 'string',
-          title: 'Outcome',          
-        	description: 'If set, the value will be overridden by api response',
-          isValueField: true
+            type: 'string',
+            title: 'Outcome',
+            description: 'If set, the value will be overridden by api response',
+            isValueField: true
         }
-      },
+    },
       events: ["ntx-value-change"],
     };
   } 
@@ -113,279 +88,172 @@ export class OncWebApiRequestDev extends LitElement {
     }
   `;
 
-  constructor() {        
-    super()        
+  constructor() {
+    super()
     this.message = 'Loading...';
-    this.webApi = '';    
-  }
+    this.webApi = '';
+}
 
-  render() {        
+render() {
     return html`        
-        <div>${this.message}</div>
-    `
-  }
+    <div>${this.message && typeof this.message === 'object' ? html`<pre>${JSON.stringify(this.message, null, 2)}</pre>` : this.message}</div>
+`
+}
 
-  _propagateOutcomeChanges(targetValue) {            
+_propagateOutcomeChanges(targetValue) {
     const args = {
-         bubbles: true,
-         cancelable: false,
-         composed: true,         
-         detail: targetValue,
-     };     
-     const event = new CustomEvent('ntx-value-change', args);
-     this.dispatchEvent(event);          
-   }
-   updated(changedProperties) {
-    super.updated(changedProperties);    
+        bubbles: true,
+        cancelable: false,
+        composed: true,
+        detail: targetValue,
+    };
+    const event = new CustomEvent('ntx-value-change', args);
+    this.dispatchEvent(event);
+}
+updated(changedProperties) {
+    super.updated(changedProperties);
     if (changedProperties.has('webApiUrl')) {
-      this.callApi(); 
+        this.callApi();
     }
-  }
-  connectedCallback() {      
-    if(this.pluginLoaded){
-      return;
-    }    
+}
+connectedCallback() {
+    if (this.pluginLoaded) {
+        return;
+    }
     this.pluginLoaded = true;
-    super.connectedCallback(); 
-    var currentPageModeIndex = this.queryParam("mode");    
-    this.currentPageMode = (currentPageModeIndex == 0 ? "New" : (currentPageModeIndex == 1 ? "Edit" : "Display"))
-    if(event.target.innerText == "Edit")
-      this.currentPageMode ="Edit";    
-    if(window.location.pathname == "/")  {
-      this.message = html`Please configure control`      
-      return;      
+    super.connectedCallback();
+    if (window.location.pathname == "/") {
+        this.message = html`Please configure control`
+        return;
     }
-    
-    if(!this.headers){
-      this.headers = '{ "Accept" : "application/json" }'
-    }
-    if(this.webApiUrl){
-      if(this.isValidJSON(this.headers)){
-        this.callApi();        
-      }
-      else{          
-        this.message = html`Invalid Headers`
-      }       
-    }
-    else{
-      this.message = html`Invalid WebApi Url`      
-    } 
-  }
 
-  async callApi(){      
-      var inputWebApi = this.webApiUrl;      
-      if(inputWebApi.indexOf("/_api/web/") == -1 && inputWebApi.indexOf("/_api/site/") == -1 ){
-        await this.loadWebApi();
-      }
-      else{
-        var hostWebUrl = this.queryParam("SPHostUrl");
-        var appWebUrl = this.queryParam("SPAppWebUrl");        
-        var spoApiUrl = appWebUrl + inputWebApi.replace(hostWebUrl, "").replace("/_api/", "/_api/SP.AppContextSite(@target)/")
-        if(inputWebApi.indexOf("?") == -1){
-            spoApiUrl = spoApiUrl + "?@target='" + hostWebUrl + "'";   
+    if (!this.headers) {
+        this.headers = '{ "Accept" : "application/json" }'
+    }
+    if (this.webApiUrl) {
+        if (this.isValidJSON(this.headers)) {
+            this.callApi();
         }
-        else{
-            spoApiUrl = spoApiUrl + "&@target='" + hostWebUrl + "'";   
+        else {
+            this.message = html`Invalid Headers`
+        }
+    }
+    else {
+        this.message = html`Invalid WebApi Url`
+    }
+}
+
+async callApi() {
+    var inputWebApi = this.webApiUrl;
+    if (inputWebApi.indexOf("/_api/web/") == -1 && inputWebApi.indexOf("/_api/site/") == -1) {
+        await this.loadWebApi();
+    }
+    else {
+        var hostWebUrl = this.queryParam("SPHostUrl");
+        var appWebUrl = this.queryParam("SPAppWebUrl");
+        var spoApiUrl = appWebUrl + inputWebApi.replace(hostWebUrl, "").replace("/_api/", "/_api/SP.AppContextSite(@target)/")
+        if (inputWebApi.indexOf("?") == -1) {
+            spoApiUrl = spoApiUrl + "?@target='" + hostWebUrl + "'";
+        }
+        else {
+            spoApiUrl = spoApiUrl + "&@target='" + hostWebUrl + "'";
         }
         await this.loadSPOApi(appWebUrl, spoApiUrl);
-      }
-      
-  }
+    }
 
-  async executeAsyncWithPromise(appWebUrl, requestInfo) {
-      return new Promise((resolve, reject) => {
-          const executor = new SP.RequestExecutor(appWebUrl);
-          executor.executeAsync({...requestInfo,
-              success: (response) => resolve(response),
-              error: (response) => reject(response),
-          });
-      });
-  }
+}
 
-  async loadSPOApi(appWebUrl, spoApiUrl){              
-      const requestInfo = {
-          url: spoApiUrl,
-          method: "GET",
-          headers: { "Accept": "application/json; odata=verbose" }
-      };
-      
-      var response;
-      try{ 
-        response = await this.executeAsyncWithPromise(appWebUrl, requestInfo);        
-      }
-      catch(e){
+async executeAsyncWithPromise(appWebUrl, requestInfo) {
+    return new Promise((resolve, reject) => {
+        const executor = new SP.RequestExecutor(appWebUrl);
+        executor.executeAsync({
+            ...requestInfo,
+            success: (response) => resolve(response),
+            error: (response) => reject(response),
+        });
+    });
+}
+
+async loadSPOApi(appWebUrl, spoApiUrl) {
+    const requestInfo = {
+        url: spoApiUrl,
+        method: "GET",
+        headers: { "Accept": "application/json; odata=verbose" }
+    };
+
+    var response;
+    try {
+        response = await this.executeAsyncWithPromise(appWebUrl, requestInfo);
+    }
+    catch (e) {
         response = {}
         response.status = "500"
-        response.statusText = e + ", Try checking end point";      
-      }
-      
-      if(response.body != undefined && response.statusCode == 200){   
-        try{
-          var jsonData = JSON.parse(response.body);           
-          jsonData = this.filterJson(jsonData);        
-        } 
-        catch(e)  {
-          this.message = html`Invalid JSON response`
-        }      
-        this.plugToForm(jsonData);
-      }
-      else{      
-        this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
-      }
-  }
+        response.statusText = e + ", Try checking end point";
+    }
 
-  async loadWebApi() {        
-    var headers = { 'accept' : 'application/json'}    
-    var fetchAttributes = {"headers" : headers};
-    if(this.isIntegratedAuth){
-      fetchAttributes = {"headers" : headers, "credentials" : "include"}
+    if (response.body != undefined && response.statusCode == 200) {
+        try {
+            var jsonData = JSON.parse(response.body);
+        }
+        catch (e) {
+            this.message = html`Invalid JSON response`
+        }
+        this.message=jsonData;
+        this._propagateOutcomeChanges(JSON.stringify(jsonData));
+    }
+    else {
+        this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
+    }
+}
+
+async loadWebApi() {
+    var headers = { 'accept': 'application/json' }
+    var fetchAttributes = { "headers": headers };
+    if (this.isIntegratedAuth) {
+        fetchAttributes = { "headers": headers, "credentials": "include" }
     }
 
     var response;
-    try{
-      response = await fetch(`${this.webApiUrl}`, fetchAttributes);      
-    }
-    catch(e){
-      response = {}
-      response.status = "500"
-      response.statusText = e + ", Try checking authentication";      
-    }
-    
-    if(response != undefined && response.status == 200){   
-      try{
-        var jsonData = await response.json();         
-        jsonData = this.filterJson(jsonData);        
-      } 
-      catch(e)  {
-        this.message = html`Invalid JSON response`
-      }      
-      this.plugToForm(jsonData);
-    }
-    else{      
-      this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
-    }
-    
-  }
-
-  plugToForm(jsonData){      
-    if(this.displayAs == "Label"){
-      this.constructLabelTemplate(jsonData)
-    }     
-    else if(this.displayAs == "Dropdown"){
-      this.constructDropdownTemplate(jsonData)
-    } 
-    else if(this.displayAs == "Label using Mustache Template"){
-      this.constructLabelUsingMustacheTemplate(jsonData)
-    }         
-    this._propagateOutcomeChanges(this.outcome);
-  }
-
-  constructLabelTemplate(jsonData){            
-      var outputTemplate = "";
-      var htmlTemplate = html``;
-      
-      if(typeof jsonData === 'string' || jsonData instanceof String){
-        outputTemplate = jsonData;
-      }    
-      if(this.isInt(jsonData)){
-        outputTemplate = jsonData.toString();
-      }
-      if(typeof jsonData == 'boolean'){
-        outputTemplate = (jsonData == true ? "true" : "false");
-      }
-      htmlTemplate = html`<div class="form-control webapi-control">${outputTemplate}</div>`;
-      
-      this.outcome = outputTemplate;      
-      this.message = html`${htmlTemplate}`            
-  }
-
-  constructDropdownTemplate(items){    
-    if(this.currentPageMode == 'New' || this.currentPageMode == 'Edit'){
-      if (typeof items === 'string') {
-        items = [items];
-    }
-
-      if(Array.isArray(items)){
-        var itemTemplates = [];
-        for (var i of items) {
-          if(this.currentPageMode == 'Edit' && i == this.outcome){
-            itemTemplates.push(html`<option selected>${i}</option>`);
-          }          
-          else{
-            itemTemplates.push(html`<option>${i}</option>`);
-          }          
-        }
-        
-        this.message = html`<select class="form-control webapi-control" @change=${e => this._propagateOutcomeChanges(e.target.value)} >
-                              ${itemTemplates}
-                            </select>
-                        `       
-      }
-      else{
-        this.message = html`<p>WebApi response not in array. Check WebApi Configuration</p>`
-      }
-    }    
-    else{
-      this.constructLabelTemplate(this.outcome);
-    }    
-  }
-
-  constructLabelUsingMustacheTemplate(jsonData){            
-      var rawValue = "";
-      var htmlTemplate = html``;
-      
-      if(typeof jsonData === 'string' || jsonData instanceof String){
-        rawValue = jsonData;
-      }    
-      if(this.isInt(jsonData)){
-        rawValue = jsonData.toString();
-      }
-      if(typeof jsonData == 'boolean'){
-        rawValue = (jsonData == true ? "true" : "false");
-      }
-      if(Array.isArray(jsonData)){
-        rawValue = jsonData;
-      }
-      
-      var outputTemplate = Mustache.render(this.mustacheTemplate, rawValue);                     
-
-      htmlTemplate = html`<div class="form-control webapi-control">${unsafeHTML(outputTemplate)}</div>`;
-      
-      this.outcome = rawValue;      
-      this.message = html`${htmlTemplate}`                  
-  }
-
-  isInt(value) {
-    return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
-  }
-
-  filterJson(jsonData){     
-    if(!this.jsonPath){
-      this.jsonPath = "$."
-    }        
-    if(jsonData){         
-        var result = JSONPath({path: this.jsonPath, json: jsonData});        
-        if (result.length == 1 && this.jsonPath.endsWith(".")) {
-            result = result[0]
-          }        
-        return result;
-    }
-  }
-
-  isValidJSON(str) {
     try {
-      JSON.parse(str);
-      return true;
-    } catch (e) {
-      return false;
+        response = await fetch(`${this.webApiUrl}`, fetchAttributes);
     }
-  }
+    catch (e) {
+        response = {}
+        response.status = "500"
+        response.statusText = e + ", Try checking authentication";
+    }
 
-  queryParam(param){    
+    if (response != undefined && response.status == 200) {
+        try {
+            var jsonData = await response.json();
+            // jsonData = this.filterJson(jsonData);        
+        }
+        catch (e) {
+            this.message = html`Invalid JSON response`
+        }
+        this.message=jsonData;
+        this._propagateOutcomeChanges(JSON.stringify(jsonData));
+    }
+    else {
+        this.message = html`WebApi request failed: ${response.status} - ${response.statusText == '' ? 'Error!' : response.statusText}`
+    }
+
+}
+
+ isValidJSON(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+queryParam(param) {
     const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
-    return urlParams.get(param); 
-  }  
-    
+    return urlParams.get(param);
+}
+
 }
 
 customElements.define('onc-webservice-request-dev', OncWebApiRequestDev);
