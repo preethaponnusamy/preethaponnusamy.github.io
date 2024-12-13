@@ -44,7 +44,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
 
     static styles = css`
         button.redirect-button {
-            background-color: #0078d4;
             border: none;
             color: white;
             padding: 10px 20px;
@@ -54,10 +53,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
             transition: background-color 0.3s ease;
             width: 100%;
             text-align: center;
-        }
-
-        button.redirect-button:hover {
-            background-color: #005a8c;
         }
 
         @media (max-width: 600px) {
@@ -72,7 +67,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         super();
         this.pluginLoaded = false;
         this.redirectUrl = '';
-        this.buttonLabel = 'Submit & Go to Website';
+        this.buttonLabel = 'CustomSubmit';
     }
 
     render() {
@@ -121,9 +116,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         }
     }
 
-    updated(changedProperties) {
-        super.updated(changedProperties);
-    }
+    
 }
 
 customElements.define('custom-button-redirectdev', CustomButtonRedirectPluginDev);
