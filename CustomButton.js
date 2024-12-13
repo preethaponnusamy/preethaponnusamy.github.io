@@ -91,7 +91,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     triggerFormSubmission() {
         const formElement = document.querySelector('form');
         if (formElement) {
-            formElement.addEventListener('submit', this.redirectAfterSubmit.bind(this));
+            // formElement.addEventListener('submit', this.redirectAfterSubmit.bind(this));
             formElement.submit();
         } else {
             console.error("Form not found!");
