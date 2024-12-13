@@ -79,15 +79,13 @@ export class CustomButtonRedirectPluginDev extends LitElement {
             const submitButton = formElement.querySelector(`button.${this.submitButtonClass}`);
             if (submitButton) {
                 submitButton.addEventListener('click', (event) => {
-                    event.preventDefault(); 
-                    formElement.submit(); 
-                    this.handleSubmit(event); 
+                   this.handleSubmit(event); 
                 });
             } else {
-                console.error(`Submit button with class '${this.submitButtonClass}' not found!`);
+                console.log(`Submit button with class '${this.submitButtonClass}' not found!`);
             }
         } else {
-            console.error("Form not found!");
+            console.log("Form not found!");
         }
     }
 }
