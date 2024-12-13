@@ -84,25 +84,29 @@ export class CustomButtonRedirectPluginDev extends LitElement {
     }
 
     handleButtonClick(event) {
-        event.preventDefault();
+        event.preventDefault(); 
         this.triggerFormSubmission();
     }
 
     triggerFormSubmission() {
         const formElement = document.querySelector('form');
         if (formElement) {
-            // formElement.addEventListener('submit', this.redirectAfterSubmit.bind(this));
-            formElement.submit();
+          
+            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
+            const submitButton = formElement.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.click(); 
+            } else {
+                console.error("Submit button not found!");
+            }
         } else {
             console.error("Form not found!");
         }
     }
 
-    redirectAfterSubmit(event) {
+    handleSubmit(event) {
         event.preventDefault();
-        event.stopPropagation();
-        if (this.redirectUrl) {
-            setTimeout(() => {
+        if (this.redirectUrl) {setTimeout(() => {
                 window.location.href = this.redirectUrl;
             }, 100); 
         } else {
