@@ -76,7 +76,6 @@ export class TestparseApiResponse extends LitElement {
                     title: 'Outcome',
                     description: 'If set, the value will be overridden by api response',
                     isValueField: true,
-                    visibility: 'hidden',
                 }
             },
             events: ["ntx-value-change"],
@@ -112,9 +111,9 @@ export class TestparseApiResponse extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
-//     div[data-e2e="outcome-get"] {
-//     display: none !important;
-// }  
+    div[data-e2e="outcome-get"] {
+    display: none !important;
+}  
    
   `;
 
