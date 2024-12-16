@@ -73,10 +73,10 @@ class OncCustomButtonDev extends LitElement {
   _submitForm() {
     const nintexForm = document.querySelector('form');
     if (nintexForm) {
-      nintexForm.requestSubmit(); 
+      nintexForm.submit(); 
       setTimeout(() => {
         if (this.redirectUrl) {
-          window.location.href = this.redirectUrl; 
+            window.location.replace(this.redirectUrl); 
         } else {
           console.error('Redirect URL is not defined.');
         }
