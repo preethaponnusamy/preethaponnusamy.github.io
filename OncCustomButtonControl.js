@@ -1,48 +1,48 @@
 import { LitElement, css, html } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
 
 class OncCustomButtonDev extends LitElement {
-  static properties = {
-    pluginLoaded: { type: Boolean },
-    redirectUrl: { type: String },
-    buttonLabel: { type: String }
-  };
-
-  static getMetaConfig() {
-    return {
-      groupName: "ONC Custom (Dont use)",
-      controlName: 'Custom Button Dev',
-      description: 'A button that redirects to a URL after form submission.',
-      iconUrl: 'data-lookup',
-      searchTerms: ['button', 'redirect', 'custom'],
-      fallbackDisableSubmit: false,
-      version: '1.2',
-      pluginAuthor: 'Preetha Ponnusamy',
-      standardProperties: {
-        fieldLabel: true,
-        description: true,
-        visibility: true
-      },
-      properties: {
-        redirectUrl: {
-          type: 'string',
-          title: 'Redirect URL',
-          description: 'URL to redirect after form submission',
-          required: true,
-          defaultValue: ''
-        },
-        buttonLabel: {
-          type: 'string',
-          title: 'Button Label',
-          description: 'Label to display on the button',
-          required: true,
-          defaultValue: 'Submit & Go to Website'
-        }
-      },
-      events: ["ntx-value-change"]
+    static properties = {
+        pluginLoaded: { type: Boolean },
+        redirectUrl: { type: String },
+        buttonLabel: { type: String }
     };
-  }
 
-  static styles = css`
+    static getMetaConfig() {
+        return {
+            groupName: "ONC Custom (Dont use)",
+            controlName: 'Custom Button Dev',
+            description: 'A button that redirects to a URL after form submission.',
+            iconUrl: 'data-lookup',
+            searchTerms: ['button', 'redirect', 'custom'],
+            fallbackDisableSubmit: false,
+            version: '1.2',
+            pluginAuthor: 'Preetha Ponnusamy',
+            standardProperties: {
+                fieldLabel: true,
+                description: true,
+                visibility: true
+            },
+            properties: {
+                redirectUrl: {
+                    type: 'string',
+                    title: 'Redirect URL',
+                    description: 'URL to redirect after form submission',
+                    required: true,
+                    defaultValue: ''
+                },
+                buttonLabel: {
+                    type: 'string',
+                    title: 'Button Label',
+                    description: 'Label to display on the button',
+                    required: true,
+                    defaultValue: 'Submit & Go to Website'
+                }
+            },
+            events: ["ntx-value-change"]
+        };
+    }
+
+    static styles = css`
     button.redirect-button {
       border: none;
       color: white;
@@ -63,35 +63,59 @@ class OncCustomButtonDev extends LitElement {
     }
   `;
 
-  constructor() {
-    super();
-    this.pluginLoaded = false;
-    this.redirectUrl = '';
-    this.buttonLabel = 'Submit & Go to Website';
-  }
-
-  _submitForm() {
-    const nintexForm = document.querySelector('form');
-    if (nintexForm) {
-        nintexForm.addEventListener('submit', (event) => {
-            event.preventDefault(); 
-            nintexForm.submit();  
-          });
-      setTimeout(() => {
-        if (this.redirectUrl) {
-            window.location.replace(this.redirectUrl); 
-        } else {
-          console.error('Redirect URL is not defined.');
-        }
-      }, 1500);
+    constructor() {
+        super();
+        this.pluginLoaded = false;
+        this.redirectUrl = '';
+        this.buttonLabel = 'Submit & Go to Website';
     }
-  }
 
-  render() {
-    return html`
-      <button class="redirect-button" @click="${this._submitForm}">${this.buttonLabel}</button>
+    render() {
+        return html`
+        <button class="form-control redirect-button" @click="${this.handleButtonClick}">
+            ${this.buttonLabel}
+        </button>
     `;
-  }
+    }
+
+    handleButtonClick(event) {
+        event.preventDefault();
+        this.triggerFormSubmission();
+    }
+
+    triggerFormSubmission() {
+        const formElement = document.querySelector('form');
+        if (formElement) {
+
+            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
+            const submitButton = formElement.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.click();
+            } else {
+                console.error("Submit button not found!");
+            }
+        } else {
+            console.error("Form not found!");
+        }
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        if (this.redirectUrl) {
+            setTimeout(() => {
+                window.location.assign(this.redirectUrl);
+            }, 500);
+        } else {
+            console.error("Redirect URL is not provided!");
+        }
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+        if (!this.pluginLoaded) {
+            this.pluginLoaded = true;
+        }
+    }
 }
 
 customElements.define('onc-custombutton-dev', OncCustomButtonDev);
