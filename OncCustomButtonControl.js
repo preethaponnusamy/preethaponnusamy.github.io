@@ -95,7 +95,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         const formElement = document.querySelector('form');
         if (formElement) {
 
-            const submitButton = formElement.querySelector('button[type="submit"]');
+            const submitButton = formElement.querySelector('button[data-e2e="btn-save-and-continue"]');
             if (submitButton) {
                 submitButton.click();
             } else {
