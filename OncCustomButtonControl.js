@@ -95,7 +95,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         const formElement = document.querySelector('form');
         if (formElement) {
 
-            formElement.addEventListener('submit', this.handleSubmit.bind(this), { once: true });
             const submitButton = formElement.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.click();
@@ -104,17 +103,6 @@ export class CustomButtonRedirectPluginDev extends LitElement {
             }
         } else {
             console.error("Form not found!");
-        }
-    }
-
-    handleSubmit(event) {
-        event.preventDefault();
-        if (this.redirectUrl) {
-            setTimeout(() => {
-                window.location.assign(this.redirectUrl);
-            }, 500);
-        } else {
-            console.error("Redirect URL is not provided!");
         }
     }
 
