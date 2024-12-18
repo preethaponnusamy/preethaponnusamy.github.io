@@ -77,7 +77,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         this.buttonLabel = 'CustomSubmit';
     }
 
-   
+
     render() {
         return html`
             <button class="form-control redirect-button" @click="${this.handleButtonClick}">
@@ -95,9 +95,15 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         const formElement = document.querySelector('form');
         if (formElement) {
 
-            const submitButton = formElement.querySelector('button[data-e2e="btn-save-and-continue"]');
-            if (submitButton) {
-                submitButton.click();
+            const saveButton = formElement.querySelector('button[data-e2e="btn-save-and-continue"]');
+            if (saveButton) {
+                // Create and dispatch a click event
+                const event = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                saveButton.dispatchEvent(event);
             } else {
                 console.error("Submit button not found!");
             }
