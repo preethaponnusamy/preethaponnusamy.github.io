@@ -77,6 +77,7 @@ export class CustomButtonRedirectPluginDev extends LitElement {
         this.buttonLabel = 'CustomSubmit';
     }
 
+   
     render() {
         return html`
             <button class="form-control redirect-button" @click="${this.handleButtonClick}">
