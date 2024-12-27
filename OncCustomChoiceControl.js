@@ -247,7 +247,7 @@ export class OncCustomChoiceDev extends LitElement {
       if (Array.isArray(items)) {
         var itemTemplates = [];
         itemTemplates.push(
-          html`<option value="" disabled selected>
+            html`<option value="" disabled ?selected="${!this.outcome}">
             ${this.defaultMessage || "Please select an option"}
           </option>`
         );
