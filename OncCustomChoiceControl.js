@@ -166,6 +166,7 @@ export class OncCustomChoiceDev extends LitElement {
 
     }
     plugToForm() {
+        var items;
         if (typeof this.inputData === 'string') {
             let sp = this.separator.replace(/\\n/g, '\n');
             items = this.inputData.split(sp);
