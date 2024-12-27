@@ -248,7 +248,7 @@ export class OncCustomChoiceDev extends LitElement {
         var itemTemplates = [];
         itemTemplates.push(
           html`<option value="" disabled selected>
-            ${this.defaultMessage || "Select an option"}
+            ${this.defaultMessage || "Please select an option"}
           </option>`
         );
         for (var i of items) {
@@ -375,7 +375,7 @@ export class OncCustomChoiceDev extends LitElement {
         this.message = html`
           <div class="form-control customchoice-control custom-multiselect-dropdown" @click=${this._toggleDropdown}>
             <div class="custom-dropdown-toggle">
-              <span id="outcome-display">Select Option</span>
+              <span id="outcome-display">${this.defaultMessage}</span>
              </div>
             <div class="custom-dropdown-content">${optionTemplates}</div>
           </div>
