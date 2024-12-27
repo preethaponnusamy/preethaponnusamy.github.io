@@ -322,8 +322,8 @@ export class OncCustomChoiceDev extends LitElement {
     } else {
       selectedValues = selectedValues.filter((val) => val !== item);
     }
-    this.outcome = selectedValues;
-    this._propagateOutcomeChanges(selectedValues);
+    this.outcome = selectedValues.toString();
+    this._propagateOutcomeChanges(selectedValues.toString());
   }
   constructLabelTemplate(input) {
     var outputTemplate = "";
@@ -397,7 +397,7 @@ export class OncCustomChoiceDev extends LitElement {
     } else {
       selectedValues = selectedValues.filter((val) => val !== e.target.value);
     }
-    this.outcome = selectedValues;
+    this.outcome = selectedValues.toString();
     const outcomeSpan = this.shadowRoot.querySelector("#outcome-display");
     if (outcomeSpan) {
       outcomeSpan.textContent =
@@ -405,7 +405,7 @@ export class OncCustomChoiceDev extends LitElement {
           ? this.outcome.join(", ")
           : "Select options";
     }
-    this._propagateOutcomeChanges(selectedValues);
+    this._propagateOutcomeChanges(selectedValues.toString());
   }
   _toggleDropdown() {
     const dropdown = this.shadowRoot.querySelector(".custom-multiselect-dropdown");
