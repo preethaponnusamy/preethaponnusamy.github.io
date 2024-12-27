@@ -22,7 +22,7 @@ export class OncCustomChoiceDev extends LitElement {
             iconUrl: 'data-lookup',
             searchTerms: ['choice', 'dropdown', 'checkbox'],
             fallbackDisableSubmit: false,
-            version: '1.1',
+            version: '1.2',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -46,9 +46,9 @@ export class OncCustomChoiceDev extends LitElement {
                 displayAs: {
                     type: 'string',
                     title: 'Display As',
-                    enum: ['Dropdown','Radio','Multi-Select Dropdown','Checkbox'],
+                    enum: ['Dropdown', 'Radio', 'Multi-Select Dropdown', 'Checkbox'],
                     defaultValue: 'Dropdown',
-                    description:'Provide display type of the control'
+                    description: 'Provide display type of the control'
                 },
                 defaultMessage: {
                     type: 'string',
@@ -107,7 +107,52 @@ export class OncCustomChoiceDev extends LitElement {
       padding: 4px 0px 3px;
       color: #000;
     }
-    
+    .checkbox-group {
+        display: block; 
+    }
+
+    .checkbox-group label {
+        display: block; 
+        margin-right: 5px; 
+    }
+        .custom-multiselect-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .dropdown-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 5px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            padding: 10px;
+        }
+        .custom-multiselect-dropdown.open .dropdown-content {
+            display: block;
+        }
+        .dropdown-content label {
+            display: block;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+        .dropdown-content input[type="checkbox"] {
+            margin-right: 10px;
+        }
   `;
 
     constructor() {
@@ -123,7 +168,7 @@ export class OncCustomChoiceDev extends LitElement {
     }
 
     _propagateOutcomeChanges(targetValue) {
-        if (!targetValue) return; 
+        if (!targetValue) return;
         const args = {
             bubbles: true,
             cancelable: false,
@@ -187,7 +232,7 @@ export class OncCustomChoiceDev extends LitElement {
         this._propagateOutcomeChanges(this.outcome);
     }
 
-    constructDropdownTemplate(items) {      
+    constructDropdownTemplate(items) {
 
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
@@ -293,7 +338,7 @@ export class OncCustomChoiceDev extends LitElement {
     }
 
     constructDropdownWithMultiSelectTemplate(items) {
-      
+
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
@@ -316,14 +361,27 @@ export class OncCustomChoiceDev extends LitElement {
                     `);
                 }
 
-                this.message = html`
-                    <select 
-                        class="form-control customchoice-control" 
-                        multiple
-                        @change=${(e) => this._handleMultiSelectChange(e)}
-                    >
-                        ${optionTemplates}
-                    </select>
+
+                this.message = html`                    
+                     <div class="custom-multiselect-dropdown">
+                        <button class="dropdown-btn">Please select</button>
+                        <div class="dropdown-content">
+                            ${items.map(item => {
+                    const isSelected = this.outcome && this.outcome.includes(item);
+                    return html`
+                                    <label>
+                                        <input 
+                                            type="checkbox" 
+                                            value="${item}" 
+                                            ?checked="${isSelected}"
+                                            @change="${(e) => this._handleMultiSelectChange(e, item)}" 
+                                        />
+                                        ${item}
+                                    </label>
+                                `;
+                })}
+                        </div>
+                    </div>
                 `;
             } else {
                 this.message = html`<p>Invalid input. Please check the configuration</p>`;
@@ -334,12 +392,17 @@ export class OncCustomChoiceDev extends LitElement {
     }
 
     _handleMultiSelectChange(e) {
-        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-        this.outcome = selectedOptions;
-        this._propagateOutcomeChanges(selectedOptions);
+        let selectedValues = [...(this.outcome || [])];
+        if (e.target.checked) {
+            selectedValues.push(item);
+        } else {
+            selectedValues = selectedValues.filter(val => val !== item);
+        }
+        this.outcome = selectedValues;
+        this._propagateOutcomeChanges(selectedValues);
     }
     constructRadioButtonTemplate(items) {
-       
+
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
