@@ -360,8 +360,7 @@ export class OncCustomChoiceDev extends LitElement {
       if (Array.isArray(items)) {
         let optionTemplates = [];
         for (let i of items) {
-            if(this.currentPageMode == "Edit")
-                this.outcome=JSON.parse(this.outcome);
+           
           const isSelected = this.outcome && this.outcome.includes(i);
           optionTemplates.push(html`
             <label>
@@ -397,6 +396,8 @@ export class OncCustomChoiceDev extends LitElement {
   }
 
   _handleMultiSelectChange(e) {
+    if(this.currentPageMode == "Edit")
+        this.outcome=JSON.parse(this.outcome);
     let selectedValues = [...(this.outcome || [])];
     if (e.target.checked) {
       selectedValues.push(e.target.value);
