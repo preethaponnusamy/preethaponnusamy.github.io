@@ -7,7 +7,7 @@ export class OncCustomChoiceDev extends LitElement {
         message: { type: String },
         inputData: { type: String },
         seperator: { type: String },
-        displayAs: { type: Object },
+        displayAs: { type: String },
         currentPageMode: { type: String },
         outcome: { type: String },
         sortOrder: { type: String },
@@ -44,10 +44,11 @@ export class OncCustomChoiceDev extends LitElement {
                     defaultValue: '$.'
                 },
                 displayAs: {
-                    type: 'object',
+                    type: 'string',
                     title: 'Display As',
                     enum: ['Dropdown','Radio','Multi-Select Dropdown','Checkbox'],
-                    defaultValue: 'Dropdown'
+                    defaultValue: 'Dropdown',
+                    description:'Provide display type of the control'
                 },
                 defaultMessage: {
                     type: 'string',
