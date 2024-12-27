@@ -84,8 +84,7 @@ export class OncCustomChoiceDev extends LitElement {
   }
 
   static styles = css`
-    select.customchoice-control,
-    .custom-multiselect-dropdown {
+    select.customchoice-control,.custom-multiselect-dropdown {
       border-radius: var(--ntx-form-theme-border-radius);
       font-size: var(--ntx-form-theme-text-input-size);
       caret-color: var(--ntx-form-theme-color-input-text);
@@ -248,7 +247,7 @@ export class OncCustomChoiceDev extends LitElement {
       if (Array.isArray(items)) {
         var itemTemplates = [];
         itemTemplates.push(
-          html`<option value="" disabled ?selected="${!this.outcome}">
+         html`<option value="" disabled ?selected="${!this.outcome}">
             ${this.defaultMessage || "Please select an option"}
           </option>`
         );
@@ -293,21 +292,18 @@ export class OncCustomChoiceDev extends LitElement {
           checkboxTemplates.push(html`
             <label>
               <input
-                type="radio"
-                name="custom-radio-group"
+                type="checkbox"
                 value="${i}"
-                ?checked="${isSelected}"
-                @change=${(e) => this._handleRadioChange(e)}
+                ?checked="${isChecked}"
+                @change=${(e) => this._handleCheckboxChange(e, i)}
               />
-              ${i} </label
-            ><br />
+              ${i}
+            </label>
           `);
         }
 
         this.message = html`
-          <div class="form-control custom-checkbox-group">
-            ${checkboxTemplates}
-          </div>
+          <div class="form-control custom-checkbox-group">${checkboxTemplates}</div>
         `;
       } else {
         this.message = html`<p>
@@ -377,17 +373,10 @@ export class OncCustomChoiceDev extends LitElement {
         }
 
         this.message = html`
-          <div
-            class="form-control customchoice-control custom-multiselect-dropdown"
-            @click=${this._toggleDropdown}
-          >
+          <div class="form-control customchoice-control custom-multiselect-dropdown" @click=${this._toggleDropdown}>
             <div class="custom-dropdown-toggle">
-              <span id="outcome-display">
-                ${this.outcome && this.outcome.length > 0
-                  ? this.outcome.join(", ")
-                  : this.defaultMessage || "Please select options"}</span
-              >
-            </div>
+              <span id="outcome-display">${this.defaultMessage}</span>
+             </div>
             <div class="custom-dropdown-content">${optionTemplates}</div>
           </div>
         `;
@@ -419,9 +408,7 @@ export class OncCustomChoiceDev extends LitElement {
     this._propagateOutcomeChanges(selectedValues);
   }
   _toggleDropdown() {
-    const dropdown = this.shadowRoot.querySelector(
-      ".custom-multiselect-dropdown"
-    );
+    const dropdown = this.shadowRoot.querySelector(".custom-multiselect-dropdown");
     dropdown.classList.toggle("open");
   }
   constructRadioButtonTemplate(items) {
@@ -453,9 +440,7 @@ export class OncCustomChoiceDev extends LitElement {
         }
 
         this.message = html`
-          <div class="form-control customchoice-control custom-radio-group">
-            ${radioButtonTemplates}
-          </div>
+          <div class="form-control customchoice-control custom-radio-group">${radioButtonTemplates}</div>
         `;
       } else {
         this.message = html`<p>
