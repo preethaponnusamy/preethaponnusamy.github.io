@@ -46,32 +46,8 @@ export class OncCustomChoiceDev extends LitElement {
                 displayAs: {
                     type: 'object',
                     title: 'Display As',
-                    // enum: ['Single-Select', 'Multi-Select'],
-                    // properties: {
-                    //     singleSelect: {
-                    //         type: 'string',
-                    //         enum: ['Dropdown', 'Radio'],
-                    //         title: 'Single-Select',
-                    //     },
-                    //     multiSelect: {
-                    //         type: 'string',
-                    //         enum: ['Dropdown', 'Checkbox'],
-                    //         title: 'Multi-Select',
-                    //     },
-                    // },
-                    defaultValue: { type: 'Single-Select', control: 'Dropdown' },
-                    properties: {
-                        type: {
-                            type: 'string',
-                            enum: ['Single-Select', 'Multi-Select'],
-                        },
-                        control: {
-                            type: 'string',
-                            enum: ['Dropdown', 'Radio', 'Checkbox'],
-                        }
-                    },
-                    description: 'Provide display type of the control',
-                    // defaultValue: 'Single-Select'
+                    enum: ['Dropdown','Radio','Multi-Select Dropdown','Checkbox'],
+                    defaultValue: 'Dropdown'
                 },
                 defaultMessage: {
                     type: 'string',
@@ -189,17 +165,17 @@ export class OncCustomChoiceDev extends LitElement {
 
     }
     plugToForm() {
-        const { type, control } = this.displayAs;
-        if (type == "Single-Select" && control == "Dropdown") {
+       
+        if (this.displayAs == "Dropdown") {
             this.constructDropdownTemplate(this.inputData)
         }
-        else if (type == "Multi-Select" && control == "Checkbox") {
+        else if (this.displayAs == "Checkbox") {
             this.constructCheckboxTemplate(this.inputData)
         }
-        else if (type == "Multi-Select" && control == "Dropdown") {
+        else if (this.displayAs == "Multi-Select Dropdown") {
             this.constructDropdownWithMultiSelectTemplate(this.inputData)
         }
-        else if (type == "Single-Select" && control == "Radio") {
+        else if (this.displayAs == "Radio") {
             this.constructRadioButtonTemplate(this.inputData)
         }
         this._propagateOutcomeChanges(this.outcome);
