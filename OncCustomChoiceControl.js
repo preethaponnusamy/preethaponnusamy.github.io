@@ -41,7 +41,7 @@ export class OncCustomChoiceDev extends LitElement {
                     type: 'string',
                     title: 'Seperator',
                     description: 'Provide seperator to split the input string',
-                    defaultValue: '$.'
+                    defaultValue: '\n'
                 },
                 displayAs: {
                     type: 'string',
