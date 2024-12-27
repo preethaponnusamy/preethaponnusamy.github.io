@@ -22,7 +22,7 @@ export class OncCustomChoiceDev extends LitElement {
             iconUrl: 'data-lookup',
             searchTerms: ['choice', 'dropdown', 'checkbox'],
             fallbackDisableSubmit: false,
-            version: '1.0',
+            version: '1.1',
             pluginAuthor: 'Preetha Ponnusamy',
             standardProperties: {
                 fieldLabel: true,
@@ -39,9 +39,9 @@ export class OncCustomChoiceDev extends LitElement {
                 },
                 separator: {
                     type: 'string',
-                    title: 'Seperator',
+                    title: 'Separator',
                     description: 'Provide seperator to split the input string',
-                    defaultValue: '\n'
+                    defaultValue: ','
                 },
                 displayAs: {
                     type: 'string',
@@ -166,26 +166,27 @@ export class OncCustomChoiceDev extends LitElement {
 
     }
     plugToForm() {
-       
+        if (typeof this.inputData === 'string') {
+            let sp = this.seperator.replace(/\\n/g, '\n');
+            items = this.inputData.split(sp);
+        }
+
         if (this.displayAs == "Dropdown") {
-            this.constructDropdownTemplate(this.inputData)
+            this.constructDropdownTemplate(items)
         }
         else if (this.displayAs == "Checkbox") {
-            this.constructCheckboxTemplate(this.inputData)
+            this.constructCheckboxTemplate(items)
         }
         else if (this.displayAs == "Multi-Select Dropdown") {
-            this.constructDropdownWithMultiSelectTemplate(this.inputData)
+            this.constructDropdownWithMultiSelectTemplate(items)
         }
         else if (this.displayAs == "Radio") {
-            this.constructRadioButtonTemplate(this.inputData)
+            this.constructRadioButtonTemplate(items)
         }
         this._propagateOutcomeChanges(this.outcome);
     }
 
-    constructDropdownTemplate(items) {
-        if (typeof items === 'string') {
-            items = items.split(this.separator);
-        }
+    constructDropdownTemplate(items) {      
 
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
@@ -222,10 +223,6 @@ export class OncCustomChoiceDev extends LitElement {
     }
 
     constructCheckboxTemplate(items) {
-        if (typeof items === 'string') {
-            items = items.split(this.separator);
-        }
-
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
@@ -295,10 +292,7 @@ export class OncCustomChoiceDev extends LitElement {
     }
 
     constructDropdownWithMultiSelectTemplate(items) {
-        if (typeof items === 'string') {
-            items = items.split(this.separator);
-        }
-
+      
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
@@ -344,10 +338,7 @@ export class OncCustomChoiceDev extends LitElement {
         this._propagateOutcomeChanges(selectedOptions);
     }
     constructRadioButtonTemplate(items) {
-        if (typeof items === 'string') {
-            items = items.split(this.separator);
-        }
-
+       
         if (Array.isArray(items)) {
             if (this.sortOrder === 'Asc') {
                 items.sort((a, b) => a > b ? 1 : -1);
