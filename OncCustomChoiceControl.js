@@ -315,6 +315,8 @@ export class OncCustomChoiceDev extends LitElement {
     }
   }
   _handleCheckboxChange(e, item) {
+    if(this.currentPageMode == "Edit")
+        this.outcome= JSON.parse(this.outcome);
     let selectedValues = [...(this.outcome || [])];
 
     if (e.target.checked) {
@@ -358,6 +360,8 @@ export class OncCustomChoiceDev extends LitElement {
       if (Array.isArray(items)) {
         let optionTemplates = [];
         for (let i of items) {
+            if(this.currentPageMode == "Edit")
+                this.outcome=JSON.parse(this.outcome);
           const isSelected = this.outcome && this.outcome.includes(i);
           optionTemplates.push(html`
             <label>
@@ -375,7 +379,9 @@ export class OncCustomChoiceDev extends LitElement {
         this.message = html`
           <div class="form-control customchoice-control custom-multiselect-dropdown" @click=${this._toggleDropdown}>
             <div class="custom-dropdown-toggle">
-              <span id="outcome-display">${this.defaultMessage}</span>
+              <span id="outcome-display">${this.outcome && this.outcome.length > 0
+                ? this.outcome.join(", ")
+                : this.defaultMessage}</span>
              </div>
             <div class="custom-dropdown-content">${optionTemplates}</div>
           </div>
@@ -403,7 +409,7 @@ export class OncCustomChoiceDev extends LitElement {
       outcomeSpan.textContent =
         this.outcome && this.outcome.length > 0
           ? this.outcome.join(", ")
-          : "Select options";
+          : this.defaultMessage;
     }
     this._propagateOutcomeChanges(selectedValues);
   }
