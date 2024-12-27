@@ -1,4 +1,4 @@
-import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
+import { LitElement, css, html } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
 
 export class OncCustomChoiceDev extends LitElement {
 
@@ -7,7 +7,7 @@ export class OncCustomChoiceDev extends LitElement {
         message: { type: String },
         inputData: { type: String },
         seperator: { type: String },
-        displayAs: { type: String },
+        displayAs: { type: Object },
         currentPageMode: { type: String },
         outcome: { type: String },
         sortOrder: { type: String },
@@ -20,7 +20,7 @@ export class OncCustomChoiceDev extends LitElement {
             controlName: 'Custom Choice Dev',
             description: 'Choice control display data from SharePoint Multiline text control',
             iconUrl: 'data-lookup',
-            searchTerms: ['choice','dropdown','checkbox'],
+            searchTerms: ['choice', 'dropdown', 'checkbox'],
             fallbackDisableSubmit: false,
             version: '1.0',
             pluginAuthor: 'Preetha Ponnusamy',
@@ -44,11 +44,34 @@ export class OncCustomChoiceDev extends LitElement {
                     defaultValue: '$.'
                 },
                 displayAs: {
-                    type: 'string',
+                    type: 'object',
                     title: 'Display As',
-                    enum: ['Dropdown','Multi-Select Dropdown','Checkbox'],
+                    // enum: ['Single-Select', 'Multi-Select'],
+                    // properties: {
+                    //     singleSelect: {
+                    //         type: 'string',
+                    //         enum: ['Dropdown', 'Radio'],
+                    //         title: 'Single-Select',
+                    //     },
+                    //     multiSelect: {
+                    //         type: 'string',
+                    //         enum: ['Dropdown', 'Checkbox'],
+                    //         title: 'Multi-Select',
+                    //     },
+                    // },
+                    defaultValue: { type: 'Single-Select', control: 'Dropdown' },
+                    properties: {
+                        type: {
+                            type: 'string',
+                            enum: ['Single-Select', 'Multi-Select'],
+                        },
+                        control: {
+                            type: 'string',
+                            enum: ['Dropdown', 'Radio', 'Checkbox'],
+                        }
+                    },
                     description: 'Provide display type of the control',
-                    defaultValue: 'Label'
+                    // defaultValue: 'Single-Select'
                 },
                 defaultMessage: {
                     type: 'string',
@@ -123,6 +146,7 @@ export class OncCustomChoiceDev extends LitElement {
     }
 
     _propagateOutcomeChanges(targetValue) {
+        if (!targetValue) return; 
         const args = {
             bubbles: true,
             cancelable: false,
@@ -135,7 +159,7 @@ export class OncCustomChoiceDev extends LitElement {
     updated(changedProperties) {
         super.updated(changedProperties);
         if (changedProperties.has('inputData')) {
-            this.getProperty();
+            this.plugToForm();
         }
     }
     connectedCallback() {
@@ -151,6 +175,9 @@ export class OncCustomChoiceDev extends LitElement {
         if (!this.inputData) {
             this.message = html`Please provide valid inputData`
         }
+        if (!this.separator) {
+            this.message = html`Please provide valid separator`
+        }
         if (this.inputData && this.separator && this.displayAs) {
             this.plugToForm();
         }
@@ -162,13 +189,19 @@ export class OncCustomChoiceDev extends LitElement {
 
     }
     plugToForm() {
-        if (this.displayAs == "Dropdown") {
+        const { type, control } = this.displayAs;
+        if (type == "Single-Select" && control == "Dropdown") {
             this.constructDropdownTemplate(this.inputData)
         }
-        else if (this.displayAs == "Checkbox") {
+        else if (type == "Multi-Select" && control == "Checkbox") {
             this.constructCheckboxTemplate(this.inputData)
         }
-        else if(this.displayAs == "Multi-Select Dropdown")
+        else if (type == "Multi-Select" && control == "Dropdown") {
+            this.constructDropdownWithMultiSelectTemplate(this.inputData)
+        }
+        else if (type == "Single-Select" && control == "Radio") {
+            this.constructRadioButtonTemplate(this.inputData)
+        }
         this._propagateOutcomeChanges(this.outcome);
     }
 
@@ -333,7 +366,59 @@ export class OncCustomChoiceDev extends LitElement {
         this.outcome = selectedOptions;
         this._propagateOutcomeChanges(selectedOptions);
     }
+    constructRadioButtonTemplate(items) {
+        if (typeof items === 'string') {
+            items = items.split(this.separator);
+        }
 
+        if (Array.isArray(items)) {
+            if (this.sortOrder === 'Asc') {
+                items.sort((a, b) => a > b ? 1 : -1);
+            } else if (this.sortOrder === 'Desc') {
+                items.sort((a, b) => a < b ? 1 : -1);
+            }
+        }
+
+        if (this.currentPageMode == 'New' || this.currentPageMode == 'Edit') {
+            if (Array.isArray(items)) {
+                let radioButtonTemplates = [];
+                for (let i of items) {
+                    const isSelected = this.outcome === i;
+                    radioButtonTemplates.push(html`
+                        <label>
+                            <input 
+                                type="radio" 
+                                name="radio-group" 
+                                value="${i}" 
+                                ?checked="${isSelected}"
+                                @change=${(e) => this._handleRadioChange(e)}
+                            >
+                            ${i}
+                        </label><br>
+                    `);
+                }
+
+                this.message = html`
+                    <div class="radio-group">
+                        ${radioButtonTemplates}
+                    </div>
+                `;
+            } else {
+                this.message = html`<p>WebApi response is not in array format. Please check WebApi Configuration.</p>`;
+            }
+        } else {
+            this.constructLabelTemplate(this.outcome);
+        }
+    }
+
+    _handleRadioChange(e) {
+        const selectedValue = e.target.value;
+        this.outcome = selectedValue;
+        this._propagateOutcomeChanges(selectedValue);
+    }
+    isInt(value) {
+        return !isNaN(value) && (function (x) { return (x | 0) === x; })(parseFloat(value))
+    }
     queryParam(param) {
         const urlParams = new URLSearchParams(decodeURIComponent(window.location.search.replaceAll("amp;", "")));
         return urlParams.get(param);
