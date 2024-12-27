@@ -322,7 +322,7 @@ export class OncCustomChoiceDev extends LitElement {
     } else {
       selectedValues = selectedValues.filter((val) => val !== item);
     }
-    this.outcome = selectedValues.join(', ');
+    this.outcome = selectedValues;
     this._propagateOutcomeChanges(selectedValues);
   }
   constructLabelTemplate(input) {
@@ -397,7 +397,7 @@ export class OncCustomChoiceDev extends LitElement {
     } else {
       selectedValues = selectedValues.filter((val) => val !== e.target.value);
     }
-    this.outcome = selectedValues.join(', ');
+    this.outcome = selectedValues;
     const outcomeSpan = this.shadowRoot.querySelector("#outcome-display");
     if (outcomeSpan) {
       outcomeSpan.textContent =
