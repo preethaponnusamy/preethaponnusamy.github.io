@@ -1,6 +1,4 @@
 import { LitElement, css, html, unsafeHTML } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
-import { JSONPath } from 'https://cdn.jsdelivr.net/npm/jsonpath-plus@10.1.0/dist/index-browser-esm.min.js';
-import Mustache from "https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"
 
 export class OncCustomChoiceDev extends LitElement {
 
@@ -267,18 +265,18 @@ export class OncCustomChoiceDev extends LitElement {
         this.outcome = selectedValues;
         this._propagateOutcomeChanges(selectedValues);
     }
-    constructLabelTemplate(jsonData) {
+    constructLabelTemplate(input) {
         var outputTemplate = "";
         var htmlTemplate = html``;
 
-        if (typeof jsonData === 'string' || jsonData instanceof String) {
-            outputTemplate = jsonData;
+        if (typeof input === 'string' || input instanceof String) {
+            outputTemplate = input;
         }
-        if (this.isInt(jsonData)) {
-            outputTemplate = jsonData.toString();
+        if (this.isInt(input)) {
+            outputTemplate = input.toString();
         }
-        if (typeof jsonData == 'boolean') {
-            outputTemplate = (jsonData == true ? "true" : "false");
+        if (typeof input == 'boolean') {
+            outputTemplate = (input == true ? "true" : "false");
         }
         htmlTemplate = html`<div class="form-control customchoice-control">${outputTemplate}</div>`;
 
