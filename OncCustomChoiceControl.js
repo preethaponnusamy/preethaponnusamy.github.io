@@ -462,8 +462,7 @@ export class OncCustomChoiceDev extends LitElement {
         `;
       } else {
         this.message = html`<p>
-          WebApi response is not in array format. Please check WebApi
-          Configuration.
+          Invalid input. Please check the configuration
         </p>`;
       }
     } else {
