@@ -84,7 +84,8 @@ export class OncCustomChoiceDev extends LitElement {
   }
 
   static styles = css`
-    select.customchoice-control,.custom-multiselect-dropdown {
+    select.customchoice-control,
+    .custom-multiselect-dropdown {
       border-radius: var(--ntx-form-theme-border-radius);
       font-size: var(--ntx-form-theme-text-input-size);
       caret-color: var(--ntx-form-theme-color-input-text);
@@ -247,7 +248,7 @@ export class OncCustomChoiceDev extends LitElement {
       if (Array.isArray(items)) {
         var itemTemplates = [];
         itemTemplates.push(
-         html`<option value="" disabled ?selected="${!this.outcome}">
+          html`<option value="" disabled ?selected="${!this.outcome}">
             ${this.defaultMessage || "Please select an option"}
           </option>`
         );
@@ -303,7 +304,9 @@ export class OncCustomChoiceDev extends LitElement {
         }
 
         this.message = html`
-          <div class="form-control custom-checkbox-group">${checkboxTemplates}</div>
+          <div class="form-control custom-checkbox-group">
+            ${checkboxTemplates}
+          </div>
         `;
       } else {
         this.message = html`<p>
@@ -315,8 +318,7 @@ export class OncCustomChoiceDev extends LitElement {
     }
   }
   _handleCheckboxChange(e, item) {
-    if(this.currentPageMode == "Edit")
-        this.outcome= JSON.parse(this.outcome);
+    if (this.currentPageMode == "Edit") this.outcome = JSON.parse(this.outcome);
     let selectedValues = [...(this.outcome || [])];
 
     if (e.target.checked) {
@@ -359,11 +361,11 @@ export class OncCustomChoiceDev extends LitElement {
     if (this.currentPageMode == "New" || this.currentPageMode == "Edit") {
       if (Array.isArray(items)) {
         let optionTemplates = [];
-        for (let i of items) { 
-            if(this.currentPageMode === "Edit"){
-                this.outcome=JSON.parse(this.outcome);
-            }                   
-             const isSelected = this.outcome && this.outcome.includes(i);
+        if (this.currentPageMode === "Edit") {
+          this.outcome = JSON.parse(this.outcome);
+        }
+        for (let i of items) {
+          const isSelected = this.outcome && this.outcome.includes(i);
           optionTemplates.push(html`
             <label>
               <input
@@ -378,12 +380,17 @@ export class OncCustomChoiceDev extends LitElement {
         }
 
         this.message = html`
-          <div class="form-control customchoice-control custom-multiselect-dropdown" @click=${this._toggleDropdown}>
+          <div
+            class="form-control customchoice-control custom-multiselect-dropdown"
+            @click=${this._toggleDropdown}
+          >
             <div class="custom-dropdown-toggle">
-              <span id="outcome-display">${this.outcome && this.outcome.length > 0
-                ? this.outcome.join(", ")
-                : this.defaultMessage}</span>
-             </div>
+              <span id="outcome-display"
+                >${this.outcome && this.outcome.length > 0
+                  ? this.outcome.join(", ")
+                  : this.defaultMessage}</span
+              >
+            </div>
             <div class="custom-dropdown-content">${optionTemplates}</div>
           </div>
         `;
@@ -415,7 +422,9 @@ export class OncCustomChoiceDev extends LitElement {
     this._propagateOutcomeChanges(selectedValues);
   }
   _toggleDropdown() {
-    const dropdown = this.shadowRoot.querySelector(".custom-multiselect-dropdown");
+    const dropdown = this.shadowRoot.querySelector(
+      ".custom-multiselect-dropdown"
+    );
     dropdown.classList.toggle("open");
   }
   constructRadioButtonTemplate(items) {
@@ -447,7 +456,9 @@ export class OncCustomChoiceDev extends LitElement {
         }
 
         this.message = html`
-          <div class="form-control customchoice-control custom-radio-group">${radioButtonTemplates}</div>
+          <div class="form-control customchoice-control custom-radio-group">
+            ${radioButtonTemplates}
+          </div>
         `;
       } else {
         this.message = html`<p>
