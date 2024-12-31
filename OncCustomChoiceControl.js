@@ -22,11 +22,11 @@ export class OncCustomChoiceDev extends LitElement {
       groupName: "ONC Custom (Dont use)",
       controlName: "Custom Choice Dev",
       description:
-        "Choice control display data from SharePoint Multiline text control",
-      iconUrl: "data-lookup",
+        "Choice control display data from string or SharePoint Multiline text control",
+      iconUrl: "choice",
       searchTerms: ["choice", "dropdown", "checkbox"],
       fallbackDisableSubmit: false,
-      version: "1.2",
+      version: "1.3",
       pluginAuthor: "Preetha Ponnusamy",
       standardProperties: {
         fieldLabel: true,
