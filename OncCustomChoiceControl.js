@@ -50,7 +50,7 @@ export class OncCustomChoiceDev extends LitElement {
         displayAs: {
           type: "string",
           title: "Display As",
-          enum: ["Dropdown", "Radio", "Multi-Select Dropdown", "Checkbox"],
+          enum: ["Dropdown", "Radio Button", "Multi-Select Dropdown", "Checkbox"],
           defaultValue: "Dropdown",
           description: "Provide display type of the control",
         },
@@ -230,7 +230,7 @@ export class OncCustomChoiceDev extends LitElement {
       this.constructCheckboxTemplate(items);
     } else if (this.displayAs == "Multi-Select Dropdown") {
       this.constructDropdownWithMultiSelectTemplate(items);
-    } else if (this.displayAs == "Radio") {
+    } else if (this.displayAs == "Radio Button") {
       this.constructRadioButtonTemplate(items);
     }
     this._propagateOutcomeChanges(this.outcome);
@@ -448,7 +448,7 @@ export class OncCustomChoiceDev extends LitElement {
                 name="custom-radio-group"
                 value="${i}"
                 ?checked="${isSelected}"
-                @change=${(e) => this._handleRadioChange(e)}
+                @change=${(e) => this._handleRadioButtonChange(e)}
               />
               ${i} </label
             ><br />
@@ -470,7 +470,7 @@ export class OncCustomChoiceDev extends LitElement {
     }
   }
 
-  _handleRadioChange(e) {
+  _handleRadioButtonChange(e) {
     const selectedValue = e.target.value;
     this.outcome = selectedValue;
     this._propagateOutcomeChanges(selectedValue);
