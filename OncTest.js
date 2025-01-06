@@ -12,8 +12,8 @@ export class OncTest extends LitElement {
 
   static getMetaConfig() {
     return {
-      groupName: "ONC Custom",
-      controlName: "Dropdown Choice",
+      groupName: "ONC Custom (Dont use)",
+      controlName: "Test Control",
       description: "A dropdown control for displaying data from a string.",
       iconUrl: "dropdown",
       searchTerms: ["dropdown"],
